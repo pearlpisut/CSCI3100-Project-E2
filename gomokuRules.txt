@@ -1,0 +1,51 @@
+There are three main Gomoku variants that I aim to implement.
+
+Freestyle Gomoku:
+    This is the simplest type of Gomoku. It has no restrictions on the
+    the opening moves nor the win condition. 
+
+Standard Gomoku:
+    Here, the current opening rule used in official tournaments is called
+    Swap2. Under this ruleset,
+        1. At the start of the game, Black first places two black pieces 
+        and one white piece on the board.
+        2. White can then choose one of the three options:
+            a. They can choose to play as Black, which ends their turn.
+            b. They can choose to play as White, and place a white stone
+            on the table to end their turn.
+            c. They can place a white stone and a black stone on the table,
+            and defer the choice to Black.
+        3. The process then repeats until a player chooses option a or b.
+    Then the game continues as in Freestyle Gomoku.
+
+Renju:
+    [Whether or not this variant will be in the final project depends on
+    time constraints.]
+
+    This is the most complex variant. In this variant, there are certain
+    restrictions on Black's possible moves. In particular,
+        1. Black cannot create a 3x3 fork.
+        2. Black cannot create a 4x4 fork.
+        3. Black cannot create an overline.
+    For more information about these, see here
+        https://www.renju.net/rules/
+    
+    The current opening rule used in official renju tournaments is called
+    Soosõrv-8. It goes as follows:
+        1. Black places 2 black stones and 1 white stone on
+        the table to start the opening.
+        2. White can then decide if they want to switch sides or not.
+        3. White places 1 white stone (4th move) on the board 
+        and declares whether there will be either 1, 2, ..., 7 or 8 5th
+        moves in the game.
+        4. Black can decide if they want to switch sides or not.
+        5. Black places as many black pieces (5th moves) on the board as
+        declared before.
+        6. White chooses one of the black pieces on the board to be placed
+        and discards the others. They then place 1 white stone (6th move).
+        7. After this, the opening phase is over and the game proceeds by
+        normal renju rules (starting with Black).
+
+    Another similar but more simple ruleset is called RIF. Its decription
+    can be found here:
+        https://www.renju.net/starting/
