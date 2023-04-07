@@ -1,0 +1,21 @@
+body, body div, form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+}
+
+button{
+    position: relative;
+    margin-top: 20px !important;
+}
+
+.hide{
+    display: none !important;
+}
+
+.show{
+    display: block !important;
+}
