@@ -49,21 +49,43 @@ app.route('/login')
                 responsee = loginAuth(res, req, data)
                 .then((responsee) => {
                     // if(responsee.admin == 'no') res.send("This admin user doesn't exist")
-                    if(responsee.admin == 'no' && responsee.player == 'yes')
-                        res.send('welcome player ', responsee.who.username)
-                    else if(responsee.admin =='yes'){
+                    if(responsee.error){
+                        const returnVal = {
+                            message: responsee.message,
+                            validated: false
+                        }
+                        res.json(returnVal)
+                    }
+                    if(!responsee.admin && responsee.player){
+                        let returnVal = {
+                            message: `welcome player (${responsee.who.username})`,
+                            validated: true,
+                            user: responsee.username,
+                            id: responsee._id,
+                            type: 'player',
+                            friends: responsee.friends
+                        }
+                        res.json(returnVal)
+
+                    }
+                    else if(responsee.admin){
                         jwt.sign(responsee.who, process.env.SECRET_ADMIN_KEY, (err, token) =>{
                             if(err) res.sendStatus(403)
-                            res.json({token})
+                            let returnVal = {
+                                message: `welcome admin (${responsee.who.username})`, 
+                                validated: true,
+                                user: responsee.username,
+                                id: responsee._id,
+                                type: 'admin'
+                            }
+                            res.json({token, ...returnVal})
                         })
                     }
-                    else // else if(responsee.admin == 'no' && responsee.player == 'no')
-                        res.send('you are not a registered player')
                 })
             })
         })
         
-//admin manu
+//admin menu
 app.get('/main/admin', verifyToken, (req, res) => {
         jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {
             if(err) res.sendStatus(403)

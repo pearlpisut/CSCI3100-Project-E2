@@ -17,8 +17,7 @@ connectToDb((err)=>{
 async function loginAuth(res, req, visitor){
     if(!visitor){
         console.log("invalid username")
-        res.send('<p>invalid username</p>')
-        return
+        return {message: 'invalid username', error: true}
     }
     // console.log(visitor)
 
@@ -26,14 +25,13 @@ async function loginAuth(res, req, visitor){
     if(!valid){
         console.log("wrong password")
         // res.send('<p>!!!! login unsuccessful. Wrong password</p>')
-        console.log('tester')
-        return {admin: "no", player: "no"}
+        return {message: 'wrong password', error: true}
     }
     else{
         console.log("login successfully!")
         if(visitor.role == "admin")
-            return {admin: "yes", player: 'yes', who: visitor}
-        else return {admin: "no", player: "yes", who: visitor}
+            return {admin: true, player: true, who: visitor, error: false}
+        else return {admin: false, player: true, who: visitor, error: false}
     }
 }
 
