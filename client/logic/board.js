@@ -1,4 +1,4 @@
-import { Engine, Utils } from "./engine/engine.js";
+import { Engine, Utils } from "./engine.js";
 const color = {
     EMPTY: 0,
     BLACK: -1,
@@ -200,12 +200,3 @@ class Board {
         }
     }
 }
-
-// Testing
-var game = new Board(19);
-game.doMove('A19');
-game.doMove('A18');
-game.doMove('A17');
-game.doMove('A15');
-game.doBestMove();
-game.printBoard();
