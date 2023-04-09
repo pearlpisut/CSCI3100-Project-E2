@@ -139,22 +139,37 @@ export class Board {
     }
 
     /**
-     * Returns a 2D array representation of the board.
-     * 
-     * @returns {Array<Array<number>>} A 2D array representing the cells of the
-     * board. 0 represents an empty cell, 1 represents a white piece and -1 represents
-     * a black piece.
+     * @typedef {Object} BoardData
+     * @property {Date} startTime starting time of the game.
+     * @property {number} timeElasped time elasped during the game in seconds.
+     * @property {number} winner winner of the game. 1 for white, -1 for black and 0 for draw.
+     * @property {Array<Array<number>>} boardArray array representation of the board. 1 for white,
+     * -1 for black and 0 for draw.
      */
-    getBoard() {
-        var boardArray = [];
+    /**
+     * Exports the data of the board.
+     * 
+     * @returns {BoardData} data of the board.
+     */
+    exportBoardData() {
+        var data = {
+            boardArray: [],
+            startTime: this.startTime,
+            timeElasped: 0,
+            winner: 2
+        }
         for (var i = 0; i < this.boardWidth; i++) {
             var row = [];
             for (var j = 0; j < this.boardWidth; j++) {
-                row.push(cells[i][j].pieceColor);
+                row.push(this.cells[i][j].pieceColor);
             }
-            boardArray.push(row);
+            data.boardArray.push(row);
         }
-        return boardArray;
+        data.startTime = this.startTime;
+        data.timeElasped = (this.endTime - this.startTime)/1000;
+        data.winner = this.checkWinner();
+
+        return data;
     }
 
     /**
@@ -169,17 +184,6 @@ export class Board {
      */
     endGame() {
         this.endTime = new Date();
-    }
-
-    /**
-     * Get the time elasped during a game in seconds. Should only be
-     * called after both startGame() and endGame() has been called
-     * already.
-     * 
-     * @returns {number} The time elasped during the game in seconds.
-     */
-    getElaspedTimeSeconds() {
-        return (this.endTime - this.startTime)/1000; 
     }
 
     /**

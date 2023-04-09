@@ -6,7 +6,7 @@ const rl = readline.createInterface({ input, output });
 
 /** This is a demo version of how the player versus player game will be implemented */
 
-var gameBoard = new Board(19);
+var gameBoard = new Board(3);
 gameBoard.startGame();
 while (gameBoard.checkWinner() == 2) {
     if (gameBoard.currentPlayer == 1) {
@@ -38,4 +38,6 @@ switch(winner) {
         console.log('Draw...');
         break;
 }
-console.log('Time elasped: ' + gameBoard.getElaspedTimeSeconds() + 's');
+var data = gameBoard.exportBoardData();
+console.log('Start time: ' + data.startTime + '\nTime elasped: ' + data.timeElasped + 's' +
+'\nWinner: ' + data.winner);

@@ -35,4 +35,6 @@ switch(winner) {
         console.log('Draw...');
         break;
 }
-console.log('Time elasped: ' + gameBoard.getElaspedTimeSeconds() + 's');
+var data = gameBoard.exportBoardData();
+console.log('Start time: ' + data.startTime + '\nTime elasped: ' + data.timeElasped + 's' +
+'\nWinner: ' + data.winner);
