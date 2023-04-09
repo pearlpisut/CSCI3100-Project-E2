@@ -198,16 +198,15 @@ export class Engine {
     }
     
     /**
-     * Do the best move according to the evaluator of the engine.
+     * Generates the best move according to the evaluator of the engine.
      * @param {number} p Player number: 1 for white and -1 for black
      * @returns {Array<number>} An array consisting of the best move found and the score of this move
      */
-    doBestMove(p) {
+    generateBestMove(p) {
         if (this.turn <= 3) {
             var moveCount = [0, 1, 8, 16];
             var moveIndex = Utils.getRandomInt(moveCount[this.turn]);
-            var move = Pattern.openings[this.turn][moveIndex];
-            this.doMove(move, p);
+            var bestMove = Utils.stringToInt(Pattern.openings[this.turn][moveIndex]);
         } else {
             var moveList = this.generateMoves();
             var maxScore = -Infinity;
@@ -222,7 +221,6 @@ export class Engine {
                 }
                 this.flipBit(moveList[i], p);
             }
-            this.doMoveInt(bestMove, p);
         }
         return (p == 1) ? [bestMove, this.whiteScore] : [bestMove, this.blackScore];
     }

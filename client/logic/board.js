@@ -16,13 +16,15 @@ class Cell {
     }
 }
 
-class Board {
+export class Board {
     boardWidth;
     currentPlayer; // color of the current player (BLACK or WHITE)
     turn; 
     cells; // array of cells in the board
     passCount; // number of passes made by each player
     engine;
+    startTime;
+    endTime;
 
     /**
      * Initializes the game board.
@@ -30,7 +32,7 @@ class Board {
      * @param {number} boardWidth The width of the board to be created.
      */
     constructor(boardWidth) {
-        this.boardWidth = boardWidth;
+        this.boardWidth = 19;
         this.currentPlayer = color.BLACK;
         this.turn = 1;
         this.cells = new Array(boardWidth);
@@ -49,23 +51,30 @@ class Board {
 
     /**
      * Place the current player's piece at the specified position and
-     * updates other information of the board.
+     * updates other information of the board. Rows are numbered 1 to 19 
+     * from bottom to top, and columns are labelled A to S from left to 
+     * right. For example, 'A19' would be top left corner.
      * 
      * @param {string} posString The string representing the move to
-     * be made.
+     * be made. 
+     * @returns {number} 0 represents successful move; 1 means move failed.
      */
     
     doMove(posString) {
-        this.currentPlayer = this.invertColor(this.currentPlayer);
-        this.turn++;
+        if (this.isOccupied(posString)) {
+            return 1;
+        } else {
+            var coords = this.stringToCoords(posString);
+            var i = coords[0];
+            var j = coords[1];
+            this.cells[i][j].pieceColor = this.currentPlayer;
+            this.cells[i][j].turn = this.turn;
+            this.engine.doMove(posString, this.currentPlayer);
 
-        var coords = this.stringToCoords(posString);
-        var i = coords[0];
-        var j = coords[1];
-        this.cells[i][j].pieceColor = this.currentPlayer;
-        this.cells[i][j].turn = this.turn;
-
-        this.engine.doMove(posString, this.currentPlayer);
+            this.currentPlayer = this.invertColor(this.currentPlayer);
+            this.turn++;
+            return 0;
+        }
     }
 
     /**
@@ -73,9 +82,6 @@ class Board {
      * accordingly.
      */
     undoMove() {
-        this.currentPlayer = this.invertColor(this.currentPlayer);
-        this.turn--;
-
         var previousI, previousJ;
         for (var i = 0; i < this.boardWidth; i++) {
             for (var j = 0; j < this.boardWidth; j++) {
@@ -88,6 +94,9 @@ class Board {
         }
         this.cells[previousI][previousJ].pieceColor = color.EMPTY;
         this.cells[previousI][previousJ].turn = -1;
+
+        this.currentPlayer = this.invertColor(this.currentPlayer);
+        this.turn--;
         
         this.engine.undoMove();
     }
@@ -96,24 +105,26 @@ class Board {
      * Pass the turn to the other player.
      */
     pass() {
-        this.currentPlayer = this.invertColor(this.currentPlayer);
-        this.turn++;
-
         if (this.currentPlayer = color.BLACK) {
             this.passCount.BLACK++;
         } else {
             this.passCount.WHITE++;
         }
 
+        this.currentPlayer = this.invertColor(this.currentPlayer);
+        this.turn++;
+
         this.engine.turn++;
     }
 
     /**
      * Do the best move as predicted by the engine.
+     * @return {number} returns the best move.
      */
     doBestMove() {
-        var bestMove = this.engine.doBestMove(this.currentPlayer)[0];
-        this.doMove(Utils.intToString(bestMove));
+        var bestMove = Utils.intToString(this.engine.generateBestMove(this.currentPlayer)[0]);
+        this.doMove(bestMove);
+        return bestMove;
     }
 
     /**
@@ -123,8 +134,8 @@ class Board {
      * @returns {boolean} True if the position is occupied by a piece, False otherwise.
      */
     isOccupied(posString) {
-        var coords = this.coordsToIndex(posString);
-        return this.cells[coords[0]][coords[1]].pieceColor == color.EMPTY;
+        var coords = this.stringToCoords(posString);
+        return this.cells[coords[0]][coords[1]].pieceColor != color.EMPTY;
     }
 
     /**
@@ -147,6 +158,31 @@ class Board {
     }
 
     /**
+     * Initializes the start time of the game
+     */
+    startGame() {
+        this.startTime = new Date();
+    }
+
+    /**
+     * Initializes the end time of the game
+     */
+    endGame() {
+        this.endTime = new Date();
+    }
+
+    /**
+     * Get the time elasped during a game in seconds. Should only be
+     * called after both startGame() and endGame() has been called
+     * already.
+     * 
+     * @returns {number} The time elasped during the game in seconds.
+     */
+    getElaspedTimeSeconds() {
+        return (this.endTime - this.startTime)/1000; 
+    }
+
+    /**
      * Checks if the board has reached a terminal state.
      * 
      * @returns {number} A number indicating the board's state.
@@ -155,7 +191,7 @@ class Board {
      */
 
     checkWinner() {
-        return this.engine.checkWinner();
+        return this.engine.eval.checkWinner();
     }
 
     // Utilities
@@ -171,23 +207,31 @@ class Board {
     }
 
     printBoard() {
+        var colorRed = "\x1b[31m";
+        var colorWhite = "\x1b[37m";
+        var colorDefault = "\x1b[0m";
+        
         for (var i = 0; i < this.boardWidth; i++) {
+            var y = 19 - i;
+            var space = y < 10 ? "  " : " ";
+            process.stdout.write(colorWhite + y.toString() + space);
             for (var j = 0; j < this.boardWidth; j++) {
                 var pieceColor = this.cells[i][j].pieceColor;
-                switch(pieceColor) {
-                    case color.EMPTY:
-                        process.stdout.write("| ");
-                        break;
-                    case color.WHITE:
-                        process.stdout.write("|O");
-                        break;
-                    case color.BLACK:
-                        process.stdout.write("|X");
-                        break;
+                if (pieceColor == -1) {
+                    process.stdout.write(colorWhite + "|" + colorRed + "X");
+                } else if (pieceColor == 1) {
+                    process.stdout.write(colorWhite + "|" + colorDefault + "O");
+                } else {
+                    process.stdout.write(colorWhite + "| ");
                 }
             }
-            process.stdout.write("|\n");
+            process.stdout.write(colorWhite + "|\n");
         }
+        process.stdout.write(space + " ");
+        for (var j = 0; j < this.boardWidth; j++) {
+            process.stdout.write(colorWhite + " " + String.fromCharCode(j + 65));
+        }
+        process.stdout.write("\n" + colorDefault);
     }
 
     printTurns() {
