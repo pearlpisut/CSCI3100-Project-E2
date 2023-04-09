@@ -50,57 +50,73 @@ export class Pattern {
         this.bitCount = bitCount;
         this.id = id;
     }
+
+    /**
+     * Initializes the static properties of the Pattern class.
+     * 
+     * @param {number} difficulty A parameter for difficulty.
+     */
+    static initializePatterns(difficulty) {
+        var row4 = {
+            present: [0n, 0n, 0n, 0n],
+            absent: [0n, 0n, 0n, 0n],
+            height: [1, 6, 6, 6],
+            width: [6, 1, 6, 6],
+            weight: []
+        }
+
+        var row5 = {
+            present: [0n, 0n, 0n, 0n],
+            absent: [0n, 0n, 0n, 0n],
+            height: [1, 5, 5, 5],
+            width: [5, 1, 5, 5],
+            weight: []
+        }
+
+        switch(difficulty) {
+            case 1:
+                row4.weight = [0, 1, 2, 3, 20];
+                row5.weight = [0, 1, 2, 3, 20, Infinity];
+                break;
+            case 2:
+                row4.weight = [0, 1, 4, 10, 20];
+                row5.weight = [0, 1, 4, 10, 20, Infinity];
+                break;
+            case 3:
+                row4.weight = [0, 0.1, 0.5, 14, 30];
+                row5.weight = [0, 0.1, 0.5, 12, 30, Infinity];
+                break;
+        }
+
+        for (var i = 1; i < 5; i++) {
+            row4.present[0] = row4.present[0] | (1n << BigInt(i));
+            row4.present[1] = row4.present[1] | (1n << BigInt(i * BOARD_WIDTH));
+            row4.present[2] = row4.present[2] | (BigInt("0b100000000000000000000") << BigInt((i - 1) * (BOARD_WIDTH + 1)));
+            row4.present[3] = row4.present[3] | (BigInt("0b100000000000000000000000") << BigInt((i - 1) * (BOARD_WIDTH - 1)));
+        }
+
+        for (var i = 0; i < 6; i++) {
+            row4.absent[0] = row4.absent[0] | (1n << BigInt(i));
+            row4.absent[1] = row4.absent[1] | (1n << BigInt(i * BOARD_WIDTH));
+            row4.absent[2] = row4.absent[2] | (1n << BigInt(i * (BOARD_WIDTH + 1)));
+            row4.absent[3] = row4.absent[3] | (BigInt("0b100000") << BigInt(i * (BOARD_WIDTH - 1)));
+        }
+
+        for (var i = 0; i < 5; i++) {
+            row5.present[0] = row5.present[0] | (1n << BigInt(i));
+            row5.present[1] = row5.present[1] | (1n << BigInt(i * BOARD_WIDTH));
+            row5.present[2] = row5.present[2] | (1n << BigInt(i * (BOARD_WIDTH + 1)));
+            row5.present[3] = row5.present[3] | (BigInt("0b10000") << BigInt(i * (BOARD_WIDTH - 1)));
+        }
+
+        row5.absent = row5.present;
+        
+        for (var i = 0; i < 4; i++) {
+            Pattern.row4Patterns[i] = new Pattern(row4.present[i], row4.absent[i], row4.width[i], row4.height[i], row4.weight, 6, i);
+            Pattern.row5Patterns[i] = new Pattern(row5.present[i], row5.absent[i], row5.width[i], row5.height[i], row5.weight, 5, i);
+        }
+    }
 }
-
-/**
- * Initializes the static properties of the Pattern class.
- */
-function initializePatterns() {
-    var row4 = {
-        present: [0n, 0n, 0n, 0n],
-        absent: [0n, 0n, 0n, 0n],
-        height: [1, 6, 6, 6],
-        width: [6, 1, 6, 6],
-        weight: [0, 0.1, 0.5, 14, 30]
-    }
-
-    var row5 = {
-        present: [0n, 0n, 0n, 0n],
-        absent: [0n, 0n, 0n, 0n],
-        height: [1, 5, 5, 5],
-        width: [5, 1, 5, 5],
-        weight: [0, 0.1, 0.5, 12, 30, Infinity]
-    }
-    for (var i = 1; i < 5; i++) {
-        row4.present[0] = row4.present[0] | (1n << BigInt(i));
-        row4.present[1] = row4.present[1] | (1n << BigInt(i * BOARD_WIDTH));
-        row4.present[2] = row4.present[2] | (BigInt("0b100000000000000000000") << BigInt((i - 1) * (BOARD_WIDTH + 1)));
-        row4.present[3] = row4.present[3] | (BigInt("0b100000000000000000000000") << BigInt((i - 1) * (BOARD_WIDTH - 1)));
-    }
-
-    for (var i = 0; i < 6; i++) {
-        row4.absent[0] = row4.absent[0] | (1n << BigInt(i));
-        row4.absent[1] = row4.absent[1] | (1n << BigInt(i * BOARD_WIDTH));
-        row4.absent[2] = row4.absent[2] | (1n << BigInt(i * (BOARD_WIDTH + 1)));
-        row4.absent[3] = row4.absent[3] | (BigInt("0b100000") << BigInt(i * (BOARD_WIDTH - 1)));
-    }
-
-    for (var i = 0; i < 5; i++) {
-        row5.present[0] = row5.present[0] | (1n << BigInt(i));
-        row5.present[1] = row5.present[1] | (1n << BigInt(i * BOARD_WIDTH));
-        row5.present[2] = row5.present[2] | (1n << BigInt(i * (BOARD_WIDTH + 1)));
-        row5.present[3] = row5.present[3] | (BigInt("0b10000") << BigInt(i * (BOARD_WIDTH - 1)));
-    }
-
-    row5.absent = row5.present;
-    
-    for (var i = 0; i < 4; i++) {
-        Pattern.row4Patterns[i] = new Pattern(row4.present[i], row4.absent[i], row4.width[i], row4.height[i], row4.weight, 6, i);
-        Pattern.row5Patterns[i] = new Pattern(row5.present[i], row5.absent[i], row5.width[i], row5.height[i], row5.weight, 5, i);
-    }
-}
-
-initializePatterns();
 
 /**
  * This is the main engine for the game.
@@ -116,13 +132,14 @@ export class Engine {
     /**
      * Initializes the game engine.
      */
-    constructor() {
+    constructor(difficulty) {
         this.black = 0n;
         this.white = 0n;
         this.blackScore = 0;
         this.whiteScore = 0;
         this.eval = new Evaluator(this);
         this.turn = 1;
+        Pattern.initializePatterns(difficulty);
     }
 
     /**

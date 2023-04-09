@@ -29,16 +29,16 @@ export class Board {
     /**
      * Initializes the game board.
      * 
-     * @param {number} boardWidth The width of the board to be created.
+     * @param {number} difficulty The difficulty for the computer player.
      */
-    constructor(boardWidth) {
+    constructor(difficulty) {
         this.boardWidth = 19;
         this.currentPlayer = color.BLACK;
         this.turn = 1;
-        this.cells = new Array(boardWidth);
-        for (var i = 0; i < boardWidth; i++) {
-            this.cells[i] = new Array(boardWidth);
-            for (var j = 0; j < boardWidth; j++) {
+        this.cells = new Array(this.boardWidth);
+        for (var i = 0; i < this.boardWidth; i++) {
+            this.cells[i] = new Array(this.boardWidth);
+            for (var j = 0; j < this.boardWidth; j++) {
                 this.cells[i][j] = new Cell();
             }
         }
@@ -46,7 +46,7 @@ export class Board {
             BLACK: 0,
             WHITE: 0
         }
-        this.engine = new Engine();
+        this.engine = new Engine(difficulty);
     }
 
     /**
