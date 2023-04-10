@@ -2,7 +2,7 @@ const express = require('express')
 const {connectToDb, getDb}  = require('./db')
 const path = require('path')
 const bcrypt = require('bcrypt')
-const {loginAuth, verifyToken} = require('./middlewares/auth')
+const {loginAuth, verifyToken, logout} = require('./middlewares/auth')
 const jwt = require('jsonwebtoken')
 const ObjectId = require('mongodb').ObjectId
 
@@ -48,26 +48,32 @@ app.route('/login')
             .then(data => {
                 responsee = loginAuth(res, req, data)
                 .then((responsee) => {
-                    // if(responsee.admin == 'no') res.send("This admin user doesn't exist")
+                    // neither registered player nor admin
                     if(responsee.error){
                         const returnVal = {
                             message: responsee.message,
                             validated: false
                         }
                         res.json(returnVal)
+                        res.redirect("/dashboard")
                     }
+                    // player
                     if(!responsee.admin && responsee.player){
-                        let returnVal = {
-                            message: `welcome player (${responsee.who.username})`,
-                            validated: true,
-                            user: responsee.username,
-                            id: responsee._id,
-                            type: 'player',
-                            friends: responsee.friends
-                        }
-                        res.json(returnVal)
-
+                        // give access to logged-in user to the game
+                        jwt.sign(responsee.who, process.env.SECRET_PLAYER_KEY, (err, token) => {
+                            let returnVal = {
+                                message: `welcome player (${responsee.who.username})`,
+                                validated: true,
+                                user: responsee.username,
+                                id: responsee._id,
+                                type: 'player',
+                                friends: responsee.friends
+                            }
+                            res.json({token, ...returnVal})
+                        })
+                            
                     }
+                    // admin
                     else if(responsee.admin){
                         jwt.sign(responsee.who, process.env.SECRET_ADMIN_KEY, (err, token) =>{
                             if(err) res.sendStatus(403)
@@ -81,39 +87,54 @@ app.route('/login')
                             res.json({token, ...returnVal})
                         })
                     }
+
                 })
             })
         })
+
+
+// logout
+app.post('/logout', [verifyToken, logout], (req, res) => {
+    // add token to be logged out to blacklist.
+})
         
 //admin menu
 app.get('/main/admin', verifyToken, (req, res) => {
-        jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {
-            if(err) res.sendStatus(403)
-            else {
-                let items = []
-                db.collection('users')
-                .find()
-                .forEach(item => {
-                    if(item.role != "admin")
-                        items.push(item)
-                })
-                .then(()=> {
-                    //res.render("usermanage.ejs", {items: items})
-                    res.json(items)
-                })
-            }
-          })
-        // console.log("this is the admin, username: ", req.user.username)
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {
+        if(err) res.sendStatus(403)
+        else {
+            let items = []
+            db.collection('users')
+            .find()
+            .forEach(item => {
+                if(item.role != "admin")
+                    items.push(item)
+            })
+            .then(()=> {
+                //res.render("usermanage.ejs", {items: items})
+                res.json(items)
+            })
+        }
+        })
+    // console.log("this is the admin, username: ", req.user.username)
 })
     
 app.delete('/main/admin/delete/:id', verifyToken, (req, res) =>{
-        jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {
-            if(err) res.sendStatus(403);
-            else {
-                printDeletedUser(req.params.id, res)
-                db.collection('users').deleteOne({'_id': new ObjectId(req.params.id)})
-            }
-          })
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {
+        if(err) res.sendStatus(403);
+        else {
+            printDeletedUser(req.params.id, res)
+            db.collection('users').deleteOne({'_id': new ObjectId(req.params.id)})
+        }
+        })
     })
 
 // Registration
@@ -139,10 +160,14 @@ app.route('/register')
     })
 
 //game history
-app.get('/main/admin/gamehist', verifyToken, (req, res) =>{
-    jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {
+app.get('/view/gamehist', verifyToken, (req, res) =>{
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, (err, authData) => {
         if(err) res.sendStatus(403);
-        else {
+        else{
             let items = []
             db.collection('games')
             .find()
@@ -156,10 +181,14 @@ app.get('/main/admin/gamehist', verifyToken, (req, res) =>{
       })
 })
 
-app.get('/main/admin/gamehist/:id', verifyToken, (req, res) =>{
-    jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {
+app.get('/view/gamehist/:id', verifyToken, (req, res) =>{
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, (err, authData) => {
         if(err) res.sendStatus(403);
-        else {
+        else if(checkLogout(req, res)){
             let game = db.collection('games').findOne({'_id': ObjectId(req.params.id)})
             res.json(game)
         }

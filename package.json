@@ -16,7 +16,6 @@
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^5.2.0",
     "node-fetch": "^2.6.9",
-    "nodemon": "^2.0.22",
-    "underscore": "^1.13.6"
+    "nodemon": "^2.0.22"
   }
 }
