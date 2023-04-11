@@ -145,6 +145,7 @@ app.route('/register')
         collection.countDocuments().then((count_doc) => newuser.id = ++count_doc)  //may need to fix this
         newuser.username = req.body.username
         newuser.friends = []
+        newuser.rating = 0
         try{
             const hashedPassword = await bcrypt.hash(req.body.password, 10)
             newuser.password = hashedPassword
@@ -331,7 +332,8 @@ app.post('/gamehist/add', verifyToken, async (req, res) => {
       if (err) res.sendStatus(403)
       else {
         //receive all data about the game from the request
-        const { player1Id, player2Id, startTime, endTime } = req.body    
+        const { player1Id, player2Id, startTime, endTime } = req.body
+        console.log(player1Id, player2Id, startTime, endTime)    
         try {           
           let newgame = {}
           newgame.player1 = player1Id
@@ -340,6 +342,29 @@ app.post('/gamehist/add', verifyToken, async (req, res) => {
           newgame.timeElapsed = endTime-startTime 
           db.collection('games').insertOne(newgame)   
           res.send("added new game history")    
+        } catch (err) {
+          res.status(400).json({message: err.message});
+        }
+      }
+    });
+});
+
+//update rating
+app.post('/update/rating', verifyToken, async (req, res) => {
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, async (err, authData) => {
+      if (err) res.sendStatus(403)
+      else {
+        //receive all data about the game from the request
+        const { player1Id, player2Id, rating1, rating2 } = req.body    
+        console.log(player1Id, player2Id, rating1, rating2)
+        try {         
+            db.collection('users').updateOne({'_id': new ObjectId(player1Id)}, {
+                $inc: { rating: rating1 }
+            })
+            db.collection('users').updateOne({'_id': new ObjectId(player2Id)}, {
+                $inc: { rating: rating2 }
+            })
+          res.send("rating updated")
         } catch (err) {
           res.status(400).json({message: err.message});
         }
