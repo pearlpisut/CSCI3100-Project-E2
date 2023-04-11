@@ -175,7 +175,7 @@ app.get('/view/gamehist', verifyToken, (req, res) =>{
                 items.push(item)
             })
             .then(()=>{
-                res.status(200).json(items)
+                res.status(200).json(authData)
             })
         }
       })
@@ -188,8 +188,8 @@ app.get('/view/gamehist/:id', verifyToken, (req, res) =>{
     }
     jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, (err, authData) => {
         if(err) res.sendStatus(403);
-        else if(checkLogout(req, res)){
-            let game = db.collection('games').findOne({'_id': ObjectId(req.params.id)})
+        else{
+            let game = db.collection('games').findOne({'_id': new ObjectId(req.params.id)})
             res.json(game)
         }
       })
@@ -199,3 +199,171 @@ function printDeletedUser(id, res){
     db.collection('users').findOne({'_id': new ObjectId(id)})
         .then(user => res.send(`deleted ${user.username}`))
 }
+
+//showing all user
+app.get('/view/users', verifyToken, (req, res) =>{
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, (err, authData) => {
+        if(err) res.sendStatus(403);
+        else{
+            let items = []
+            db.collection('users')
+            .find()
+            .forEach(item => {
+                items.push(item)
+            })
+            .then(()=>{
+                res.status(200).json(authData)
+            })
+        }
+      })
+})
+
+//adding new friend
+app.post('/user/friend/:id', verifyToken, async (req, res) => {
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, async (err, authData) => {
+      if (err) res.sendStatus(403)
+      else {
+          const friendId = req.params.id
+          const self = authData._id
+          //add me to friend's friends list
+          db.collection('users').findOne({'_id': new ObjectId(friendId)})
+          .then(friend => {
+              db.collection('users').updateOne({'_id': new ObjectId(friendId)}, {
+                $set: {
+                    friends: friend.friends?[self, ...friend.friends]:[self]
+                }
+              })
+          })
+          //add friend to my friends list
+          db.collection('users').findOne({'_id': new ObjectId(self)})
+          .then( me => {
+            let append
+            if(!me.friends) append = [friendId]
+            else append = [friendId, ...me.friends]
+            db.collection('users').updateOne({'_id': new ObjectId(self)}, {
+                $set: {
+                    friends: append
+                }
+              })
+          })
+          res.send("friend added")
+      }
+    });
+});
+
+//view one's own friend
+app.get('/view/myfriends', verifyToken, (req, res) =>{
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, (err, authData) => {
+        if(err) res.sendStatus(403);
+        else{
+            let items = []
+            db.collection('users').find({friends: {$all: [authData._id]}})
+            .forEach(item => {
+                items.push(item.username)
+            })
+            .then(()=>{
+                res.status(200).json(items)
+            })
+        }
+      })
+})
+
+//remove friend
+app.post('/user/friend/remove/:id', verifyToken, async (req, res) => {
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, async (err, authData) => {
+      if (err) res.sendStatus(403)
+      else {
+          const friendId = req.params.id
+          const self = authData._id
+          //remove me from friend's friends list
+          db.collection('users').findOne({'_id': new ObjectId(friendId)})
+          .then(friend => {
+                let newList
+                const index = friend.friends.indexOf(self);
+                if (index > -1) {
+                    newList = friend.friends.splice(index, 1)
+                }
+                db.collection('users').updateOne({'_id': new ObjectId(friendId)}, {
+                    $set: {
+                        friends: newList?newList:[]
+                    }
+                })
+          })
+          //remove friend from my friends list
+          db.collection('users').findOne({'_id': new ObjectId(self)})
+          .then( me => {
+            let newList
+            const index = me.friends.indexOf(self);
+            if (index > -1) {
+                newList = me.friends.splice(index, 1)
+            }
+            db.collection('users').updateOne({'_id': new ObjectId(self)}, {
+                $set: {
+                    friends: newList?newList:[]
+                }
+              })
+          })
+          res.send("friend removed")
+      }
+    });
+});
+
+//show specific user (for showing opponent's info/a specific friend)
+app.get('/view/:id', verifyToken, (req, res) =>{
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, (err, authData) => {
+        if(err) res.sendStatus(403);
+        else{
+            db.collection('users').findOne({'_id': new ObjectId(req.params.id)})
+                .then(user => {
+                    let returnVal = {}
+                    returnVal.username = user.username
+                    returnVal._id = user._id
+                    returnVal.friends = user.friends
+                    res.json(returnVal)
+                })
+        }
+      })
+})
+
+//add new game history to DB
+app.post('/gamehist/add', verifyToken, async (req, res) => {
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, async (err, authData) => {
+      if (err) res.sendStatus(403)
+      else {
+        const { player1Id, player2Id, startTime, endTime } = req.body    
+        try {
+          // Find player1 and player2 using their id in the User
+            
+          let newgame = {}
+          newgame.player1 = player1Id
+          newgame.player2 = player2Id
+          newgame.startTime = startTime
+          newgame.timeElapsed = endTime-startTime 
+          db.collection('games').insertOne(newgame)   
+          res.send("added new game history")    
+        } catch (err) {
+          res.status(400).json({message: err.message});
+        }
+      }
+    });
+});
