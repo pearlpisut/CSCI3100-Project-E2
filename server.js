@@ -55,12 +55,12 @@ app.route('/login')
                             validated: false
                         }
                         res.json(returnVal)
-                        res.redirect("/dashboard")
                     }
                     // player
                     if(!responsee.admin && responsee.player){
-                        // give access to logged-in user to the game
+                        // only grant access to logged-in user to the game
                         jwt.sign(responsee.who, process.env.SECRET_PLAYER_KEY, (err, token) => {
+                            if(err) res.sendStatus(403)
                             let returnVal = {
                                 message: `welcome player (${responsee.who.username})`,
                                 validated: true,
@@ -114,10 +114,7 @@ app.get('/main/admin', verifyToken, (req, res) => {
                 if(item.role != "admin")
                     items.push(item)
             })
-            .then(()=> {
-                //res.render("usermanage.ejs", {items: items})
-                res.json(items)
-            })
+            .then(()=> res.json(items) )
         }
         })
     // console.log("this is the admin, username: ", req.user.username)
@@ -201,7 +198,7 @@ function printDeletedUser(id, res){
 }
 
 //showing all user
-app.get('/view/users', verifyToken, (req, res) =>{
+app.get('/view/allusers', verifyToken, (req, res) =>{
     if(req.logout == "true"){
         res.sendStatus(401)
         return
@@ -212,18 +209,14 @@ app.get('/view/users', verifyToken, (req, res) =>{
             let items = []
             db.collection('users')
             .find()
-            .forEach(item => {
-                items.push(item)
-            })
-            .then(()=>{
-                res.status(200).json(authData)
-            })
+            .forEach(item => items.push(item) )
+            .then(()=> res.json(items) )
         }
       })
 })
 
 //adding new friend
-app.post('/user/friend/:id', verifyToken, async (req, res) => {
+app.post('/user/friend/add/:id', verifyToken, async (req, res) => {
     if(req.logout == "true"){
         res.sendStatus(401)
         return
@@ -260,7 +253,7 @@ app.post('/user/friend/:id', verifyToken, async (req, res) => {
 });
 
 //view one's own friend
-app.get('/view/myfriends', verifyToken, (req, res) =>{
+app.get('/user/friend/view', verifyToken, (req, res) =>{
     if(req.logout == "true"){
         res.sendStatus(401)
         return
@@ -289,37 +282,24 @@ app.post('/user/friend/remove/:id', verifyToken, async (req, res) => {
     jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, async (err, authData) => {
       if (err) res.sendStatus(403)
       else {
-          const friendId = req.params.id
-          const self = authData._id
-          //remove me from friend's friends list
-          db.collection('users').findOne({'_id': new ObjectId(friendId)})
-          .then(friend => {
-                let newList
-                const index = friend.friends.indexOf(self);
-                if (index > -1) {
-                    newList = friend.friends.splice(index, 1)
+            const friendId = req.params.id
+            const self = authData._id
+            //remove me from friend's friends list
+            db.collection('users').updateOne({'_id': new ObjectId(friendId)}, {
+                $pull: {
+                    friends: self   
                 }
-                db.collection('users').updateOne({'_id': new ObjectId(friendId)}, {
-                    $set: {
-                        friends: newList?newList:[]
-                    }
-                })
-          })
-          //remove friend from my friends list
-          db.collection('users').findOne({'_id': new ObjectId(self)})
-          .then( me => {
-            let newList
-            const index = me.friends.indexOf(self);
-            if (index > -1) {
-                newList = me.friends.splice(index, 1)
-            }
+            })
+            //remove friend from my friends list
             db.collection('users').updateOne({'_id': new ObjectId(self)}, {
-                $set: {
-                    friends: newList?newList:[]
+                $pull: {
+                    friends: friendId   
                 }
               })
-          })
-          res.send("friend removed")
+            db.collection('users').findOne({'_id': new ObjectId(friendId)})
+                .then(friend => {
+                    res.send(`(${authData.username}) and (${friend.username}) are no longer friends`)
+                })
       }
     });
 });
@@ -350,10 +330,9 @@ app.post('/gamehist/add', verifyToken, async (req, res) => {
     jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, async (err, authData) => {
       if (err) res.sendStatus(403)
       else {
+        //receive all data about the game from the request
         const { player1Id, player2Id, startTime, endTime } = req.body    
-        try {
-          // Find player1 and player2 using their id in the User
-            
+        try {           
           let newgame = {}
           newgame.player1 = player1Id
           newgame.player2 = player2Id
