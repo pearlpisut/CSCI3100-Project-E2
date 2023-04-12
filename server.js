@@ -10,11 +10,11 @@ const PORT = process.env.PORT
 
 const app = express()
 
-// const cors = require("cors")
+const cors = require("cors")
 
-// app.use(cors({
-//     origin: '*'
-// }))
+app.use(cors({
+    origin: '*'
+}))
 
 app.set("view-engine", "ejs")
 app.set("views", "./views")
@@ -64,8 +64,7 @@ app.route('/login')
                             let returnVal = {
                                 message: `welcome player (${responsee.who.username})`,
                                 validated: true,
-                                user: responsee.username,
-                                id: responsee._id,
+                                user: responsee.who,
                                 type: 'player',
                                 friends: responsee.friends
                             }
@@ -80,8 +79,7 @@ app.route('/login')
                             let returnVal = {
                                 message: `welcome admin (${responsee.who.username})`, 
                                 validated: true,
-                                user: responsee.username,
-                                id: responsee._id,
+                                user: responsee.who,
                                 type: 'admin'
                             }
                             res.json({token, ...returnVal})
@@ -150,9 +148,12 @@ app.route('/register')
             const hashedPassword = await bcrypt.hash(req.body.password, 10)
             newuser.password = hashedPassword
             db.collection("users").insertOne(newuser)
-            res.redirect('/login')
+            // res.redirect('/login')
+            res.json({status: 'ok'})
         } catch{
-            res.redirect('/register')
+            // res.redirect('/register')
+            res.json({status: 'failed'})
+
         }
         console.log(newuser)
     })
@@ -173,7 +174,7 @@ app.get('/view/gamehist', verifyToken, (req, res) =>{
                 items.push(item)
             })
             .then(()=>{
-                res.status(200).json(authData)
+                res.status(200).json(items)
             })
         }
       })
@@ -265,7 +266,10 @@ app.get('/user/friend/view', verifyToken, (req, res) =>{
             let items = []
             db.collection('users').find({friends: {$all: [authData._id]}})
             .forEach(item => {
-                items.push(item.username)
+                let tmp = {}
+                tmp.username = item.username
+                tmp.status = 'offline'
+                items.push(tmp)
             })
             .then(()=>{
                 res.status(200).json(items)

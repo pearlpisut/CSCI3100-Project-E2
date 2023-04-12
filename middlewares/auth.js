@@ -64,7 +64,8 @@ function logout(req, res, next){
     console.log("Logged out: ", req.logout)
     //if logged out then return unauthorized
     if(req.logout == "true"){
-        res.sendStatus(401)
+        // res.sendStatus(401)
+        res.json({status: 'logged-out-already'})
         return
     }
     //if not logged out, continue. Then, append the token to blacklist
@@ -72,7 +73,7 @@ function logout(req, res, next){
         .then(count => {
             if(count == 0){
                 db.collection('blacklist').insertOne({token: req.token})
-                res.json({msg: "blacklist succeeded"})
+                res.json({status: 'logged-out-successfully'})
             }
         })
     next()
