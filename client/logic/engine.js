@@ -212,6 +212,8 @@ export class Engine {
         this.whiteScore = score[0];
         this.blackScore = score[1];
         this.turn--;
+
+        return lastMove;
     }
     
     /**

@@ -25,6 +25,7 @@ export class Board {
     engine;
     startTime;
     endTime;
+    difficulty;
 
     /**
      * Initializes the game board.
@@ -47,6 +48,9 @@ export class Board {
             WHITE: 0
         }
         this.engine = new Engine(difficulty);
+        this.startTime = 0;
+        this.endTime = 0;
+        this.difficulty = difficulty;
     }
 
     /**
@@ -80,6 +84,8 @@ export class Board {
     /**
      * Undo the previous move and restore the information of the board
      * accordingly.
+     * 
+     * @returns {number} returns the index of the move undone.
      */
     undoMove() {
         var previousI, previousJ;
@@ -98,7 +104,7 @@ export class Board {
         this.currentPlayer = this.invertColor(this.currentPlayer);
         this.turn--;
         
-        this.engine.undoMove();
+        return this.engine.undoMove();
     }
 
     /**
@@ -155,7 +161,7 @@ export class Board {
         var data = {
             boardArray: [],
             startTime: this.startTime,
-            timeElasped: 0,
+            timeElasped: this.getTimeElasped(),
             winner: 2
         }
         for (var i = 0; i < this.boardWidth; i++) {
@@ -166,10 +172,49 @@ export class Board {
             data.boardArray.push(row);
         }
         data.startTime = this.startTime;
-        data.timeElasped = (this.endTime - this.startTime)/1000;
         data.winner = this.checkWinner();
+        if (this.endTime != 0) {
+            data.timeElasped = (this.endTime - this.startTime)/1000;
+        }
 
         return data;
+    }
+
+    /**
+     * Gets the time elasped since the start of the game in seconds.
+     * @returns {number} time elasped since the start in seconds.
+     */
+
+    getTimeElasped() {
+        var currentTime = new Date();
+        var timeElasped = (currentTime - this.startTime)/1000;
+        return timeElasped;
+    }
+
+    /**
+     * Resets the board. Don't forget to start the game again after resetting!
+     * Otherwise, the startTime might not be correctly initialized,
+     * since it is done by the startGame() function.
+     */
+
+    resetBoard() {
+        this.boardWidth = 19;
+        this.currentPlayer = color.BLACK;
+        this.turn = 1;
+        this.cells = new Array(this.boardWidth);
+        for (var i = 0; i < this.boardWidth; i++) {
+            this.cells[i] = new Array(this.boardWidth);
+            for (var j = 0; j < this.boardWidth; j++) {
+                this.cells[i][j] = new Cell();
+            }
+        }
+        this.passCount = {
+            BLACK: 0,
+            WHITE: 0
+        }
+        this.engine = new Engine(this.difficulty);
+        this.startTime = 0;
+        this.endTime = 0;
     }
 
     /**
