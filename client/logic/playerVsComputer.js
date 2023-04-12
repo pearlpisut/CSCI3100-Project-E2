@@ -17,10 +17,12 @@ while (gameBoard.checkWinner() == 2) {
             continue;
         }
     } else {
-        var bestMove = gameBoard.doBestMove();
+        var bestMove = gameBoard.doBestMove2();
         console.log('Computer\'s turn: ' + bestMove);
     }
     gameBoard.printBoard();
+    console.log('White score: ' + gameBoard.engine.whiteScore);
+    console.log('Black score: ' + gameBoard.engine.blackScore);
 }
 gameBoard.endGame();
 var winner = gameBoard.checkWinner();

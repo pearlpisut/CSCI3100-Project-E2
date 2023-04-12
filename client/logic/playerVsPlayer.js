@@ -16,7 +16,7 @@ while (gameBoard.checkWinner() == 2) {
     }
     rl.pause();
     if (move == 'undo') {
-        gameBoard.undoMove();
+        console.log(gameBoard.undoMove());
     } else {
         var moveFail = gameBoard.doMove(move);
         if (moveFail == 1) {

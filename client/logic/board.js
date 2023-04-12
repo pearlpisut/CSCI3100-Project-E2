@@ -65,20 +65,22 @@ export class Board {
      */
     
     doMove(posString) {
+        var coords = this.stringToCoords(posString);
+        var i = coords[0];
+        var j = coords[1];
+        if (i < 0 || i > 18 || j < 0 || j > 18) {
+            return 1;
+        }
         if (this.isOccupied(posString)) {
             return 1;
-        } else {
-            var coords = this.stringToCoords(posString);
-            var i = coords[0];
-            var j = coords[1];
-            this.cells[i][j].pieceColor = this.currentPlayer;
-            this.cells[i][j].turn = this.turn;
-            this.engine.doMove(posString, this.currentPlayer);
-
-            this.currentPlayer = this.invertColor(this.currentPlayer);
-            this.turn++;
-            return 0;
         }
+        this.cells[i][j].pieceColor = this.currentPlayer;
+        this.cells[i][j].turn = this.turn;
+        this.engine.doMove(posString, this.currentPlayer);
+
+        this.currentPlayer = this.invertColor(this.currentPlayer);
+        this.turn++;
+        return 0;
     }
 
     /**
@@ -129,6 +131,12 @@ export class Board {
      */
     doBestMove() {
         var bestMove = Utils.intToString(this.engine.generateBestMove(this.currentPlayer)[0]);
+        this.doMove(bestMove);
+        return bestMove;
+    }
+
+    doBestMove2() {
+        var bestMove = Utils.intToString(this.engine.generateBestMove2(this.currentPlayer)[0]);
         this.doMove(bestMove);
         return bestMove;
     }

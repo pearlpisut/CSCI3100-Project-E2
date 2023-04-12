@@ -75,16 +75,16 @@ export class Pattern {
 
         switch(difficulty) {
             case 1:
-                row4.weight = [0, 1, 2, 3, 20];
-                row5.weight = [0, 1, 2, 3, 20, Infinity];
+                row4.weight = [0, 1, 2, 3, 50];
+                row5.weight = [0, 1, 2, 3, 20, 50000000];
                 break;
             case 2:
-                row4.weight = [0, 1, 4, 10, 20];
-                row5.weight = [0, 1, 4, 10, 20, Infinity];
+                row4.weight = [0, 1, 4, 10, 50];
+                row5.weight = [0, 1, 4, 10, 20, 50000000];
                 break;
             case 3:
-                row4.weight = [0, 0.1, 0.5, 14, 30];
-                row5.weight = [0, 0.1, 0.5, 12, 30, Infinity];
+                row4.weight = [0, 0.1, 0.5, 14, 50];
+                row5.weight = [0, 0.1, 0.5, 12, 30, 50000000];
                 break;
         }
 
@@ -244,6 +244,68 @@ export class Engine {
         return (p == 1) ? [bestMove, this.whiteScore] : [bestMove, this.blackScore];
     }
 
+    generateBestMove2(p) {
+        if (this.turn <= 3) {
+            var moveCount = [0, 1, 8, 16];
+            var moveIndex = Utils.getRandomInt(moveCount[this.turn]);
+            var bestMove = Utils.stringToInt(Pattern.openings[this.turn][moveIndex]);
+            return (p == 1) ? [bestMove, this.whiteScore] : [bestMove, this.blackScore];
+        } else {
+            if (p == 1) {
+                var whiteMoves = this.generateMoves();
+                var bestWhiteMove = whiteMoves[0];
+                var bestWhiteScore = -Infinity;
+                for (var i = 0; i < whiteMoves.length; i++) {
+                    this.doMoveInt(whiteMoves[i], 1);
+                    var blackMoves = this.generateMoves();
+                    var bestBlackScore = +Infinity;
+                    for (var j = 0; j < blackMoves.length; j++) {
+                        this.doMoveInt(blackMoves[j], -1);
+                        if (this.blackScore <= bestBlackScore) {
+                            bestBlackScore = this.blackScore;
+                        }
+                        this.undoMove();
+                        if (bestBlackScore <= bestWhiteScore) {
+                            break;
+                        }
+                    }
+                    this.undoMove();
+                    console.log('Searched move ' + Utils.intToString(whiteMoves[i]) + ', best black can get is: ' + bestBlackScore);
+                    if (bestBlackScore > bestWhiteScore) {
+                        bestWhiteScore = bestBlackScore;
+                        bestWhiteMove = whiteMoves[i];
+                    }
+                }
+                return [bestWhiteMove, bestWhiteScore]
+            } else {
+                var blackMoves = this.generateMoves();
+                var bestBlackMove = blackMoves[0];
+                var bestBlackScore = +Infinity;
+                for (var i = 0; i < blackMoves.length; i++) {
+                    this.doMoveInt(blackMoves[i], -1);
+                    var whiteMoves = this.generateMoves();
+                    var bestWhiteScore = -Infinity;
+                    for (var j = 0; j < whiteMoves.length; j++) {
+                        this.doMoveInt(whiteMoves[j], 1);
+                        if (this.whiteScore >= bestWhiteScore) {
+                            bestWhiteScore = this.whiteScore;
+                        }
+                        this.undoMove();
+                        if (bestWhiteScore >= bestBlackScore) {
+                            break;
+                        }
+                    }
+                    this.undoMove();
+                    if (bestWhiteScore <= bestBlackScore) {
+                        bestBlackScore = bestWhiteScore;
+                        bestBlackMove = blackMoves[i];
+                    }
+                }
+                return [bestBlackMove, bestBlackScore]
+            }
+        }
+    }
+
     /**
      * Generates a list of currently available moves.
      * @returns {Array<number>} An array of currently available moves
@@ -401,7 +463,7 @@ class Evaluator {
             absent = absent << shift;
         }
 
-        var defense = 3.5;
+        var defense = 1.3;
 
         var whiteScoreAdjustment = (newWhiteAdvantage - defense * newWhiteDisadvantage) - (oldWhiteAdvantage - defense * oldWhiteDisadvantage);
         var blackScoreAdjustment = (newWhiteDisadvantage - defense * newWhiteAdvantage) - (oldWhiteDisadvantage - defense * oldWhiteAdvantage);
@@ -452,9 +514,9 @@ class Evaluator {
         if (this.engine.turn == BOARD_WIDTH * BOARD_WIDTH + 1) {
             return 0;
         }
-        if (this.engine.whiteScore == Infinity) {
+        if (this.engine.whiteScore >= 1000000) {
             return 1;
-        } else if (this.engine.whiteScore == -Infinity) {
+        } else if (this.engine.whiteScore <= -1000000) {
             return -1;
         }
         return 2;
