@@ -126,7 +126,8 @@ app.delete('/main/admin/delete/:id', verifyToken, (req, res) =>{
     jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {
         if(err) res.sendStatus(403);
         else {
-            printDeletedUser(req.params.id, res)
+            // printDeletedUser(req.params.id, res)
+            console.log('user deleted')
             db.collection('users').deleteOne({'_id': new ObjectId(req.params.id)})
         }
         })
