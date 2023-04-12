@@ -1,0 +1,130 @@
+@import "./colors.scss";
+
+.search-form-container {
+
+    margin: 0 0 20px 0;
+
+    form {
+        display: flex;
+        align-items: center;
+    }
+
+    input {
+        background-color: $fg0;
+        font-family: 'Roboto';
+        font-weight: 700;
+        font-size: 22px;
+        width: 230px;
+        height: 40px;
+        border-radius: 8px;
+        margin: 0 8px 0 0;
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: $fg4;
+        font-family: 'Roboto';
+        font-weight: 500;
+        opacity: 1; /* Firefox */
+    }
+    
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: $fg4;
+        font-family: 'Roboto';
+        font-weight: 500;
+    }
+    
+    ::-ms-input-placeholder { /* Microsoft Edge */
+        color: $fg4;
+        font-family: 'Roboto';
+        font-weight: 500;
+    }
+
+    div {
+        width:40px;
+        /* margin: 0 40px 0 0; */
+    }
+
+    button {
+        background-color: rgba(0, 0, 0 ,0);
+        color: $fg3;
+        font-family: 'Open Sans', sans-serif !important;
+        font-size: 30px;
+        border-radius: 8px;
+        border: 0;
+    }
+}
+
+.user-container {
+    background-color: $bg2;
+    height: 100px;
+    border-radius: 12px;
+    display: flex;
+    padding: 0 30px;
+    margin: 0 0 20px 0;
+
+    div {
+        display: flex;
+        align-items: center;
+        width: 33.33%;
+        /* Use calc if supported, ignore if not supported */
+        width: calc(100% / 3);
+    }
+
+    p {
+        font-size: 24px;
+        border-radius: 8px;
+    }
+
+    .username {
+        background-color: $fg2;
+        color: $text-black;
+        line-height: 37px;
+        height: 37px;
+        width: 160px;
+        box-sizing: border-box;
+        margin: 0 0 0 20px;
+        padding: 0 0 0 7px;
+        text-align: left;
+    }
+    
+    .status {
+        color: $fg0;
+        justify-content: center;
+    }
+
+    .avatar {
+        /* Default placeholder color */
+        background-color: $fg2;
+        /* TODO: Insert user profile image */
+        display: inline-block;
+        height: 60px;
+        width: 60px;
+        border-radius: 50%;
+    }
+    
+    .btn-functions {
+        justify-content: right;
+    }
+    
+    .btn-functions button {
+        background-color: $fg3;
+        color: $text-black;
+        font-family: 'Roboto';
+        font-weight: 700;
+        font-size: 24px;
+        display: inline-block;
+        line-height: 37px;
+        height: 37px;
+        width: fit-content;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        text-decoration: none;
+        margin: 0 15px 0 0;
+    }
+    
+    .btn-functions button:last-child {
+        margin: 0;
+    }
+
+}

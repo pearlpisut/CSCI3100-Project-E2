@@ -1,0 +1,26 @@
+@import "https://fonts.googleapis.com/css2?family=Roboto:wght@500;700;900&display=swap";
+
+$bg0_h: #1D2021;
+$bg0: #282828;
+$bg1: #3c3836;
+$bg2: #504945;
+$fg0: #FBF1C7;
+$fg2: #d5c4a1;
+$fg3: #BDAE93;
+$fg4: #A89984;
+$text-white: #FFFFFF;
+$text-white2: #D9D9D9;
+$text-black: #000000;
+$blue-d: #458588;
+$aqua-d: #689d6a;
+$red-l: #fb4934;
+
+/* Defaults */
+body {
+    background-color: $bg0_h;
+    color: $fg3;
+    font-family: 'Roboto';
+    font-weight: 700;
+    text-align: center;
+    margin: 150px 200px 50px 200px;
+}
