@@ -218,6 +218,18 @@ export class Board {
     }
 
     /**
+     * Changes the difficulty of the computer player. Note that this creates a new engine,
+     * so don't call this in the middle of a game. Otherwise, this can cause mismatches between
+     * the engine and the board.
+     * 
+     * @param {number} difficulty The new difficulty for the computer player.
+     */
+    changeDifficulty(difficulty) {
+        this.difficulty = difficulty;
+        this.engine = new Engine(difficulty);
+    }
+
+    /**
      * Initializes the start time of the game
      */
     startGame() {
