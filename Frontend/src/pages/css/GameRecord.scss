@@ -1,0 +1,107 @@
+@import "./colors.scss";
+
+.record-container {
+    background-color: $bg2;
+    color: $fg0;
+    font-weight: 500;
+    box-sizing: border-box;
+    height: 200px;
+    border-radius: 12px;
+    display: grid;
+    align-items: center;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    padding: 10px 30px;
+    margin: 0 0 20px 0;
+}
+
+.record-container button {
+    background-color: $fg3;
+    color: $text-black;
+    font-family: 'Roboto';
+    font-weight: 700;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 45px;
+    height: 45px;
+    width: fit-content;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.record-container a {
+    background-color: $fg3;
+    color: $text-black;
+    font-family: 'Roboto';
+    font-weight: 700;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 45px;
+    height: 45px;
+    width: fit-content;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.record-container p {
+    font-size: 24px;
+    margin: 0;
+}
+
+.win-loss {
+    text-align: left;
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+.win-loss p {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 38px;
+    text-transform: uppercase;
+}
+
+.player {
+    display: flex;
+    align-items: center;
+    line-height: 45px;
+    height: 45px;
+    width: 260px;
+}
+
+.winner {
+    background-color: $fg2;
+    color: $text-black;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+.player p:first-child {
+    margin-left: 10px;
+}
+
+.player p:last-child {
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+/* p.class due to specificity issues */
+p.black-piece {
+    background-color: $bg0;
+    height: 18px;
+    width: 18px;
+    margin:0 10px 0 0;
+    border-radius: 50%;
+}
+
+p.white-piece {
+    background-color: $text-white2;
+    height: 18px;
+    width: 18px;
+    margin:0 10px 0 0;
+    border-radius: 50%;
+}

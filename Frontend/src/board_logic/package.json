@@ -1,0 +1,12 @@
+{
+  "name": "engine",
+  "version": "1.0.0",
+  "description": "A mediocre gomoku engine",
+  "main": "engine.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kyaw Shin Thant",
+  "license": "ISC",
+  "type" : "module"
+}

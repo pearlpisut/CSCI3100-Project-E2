@@ -1,0 +1,77 @@
+@import "./colors.scss";
+@import "../fontawesome/scss/fontawesome.scss";
+@import "../fontawesome/scss/solid.scss";
+
+.chat-form-container {
+    form {
+        display: flex;
+        align-items: center;
+    }
+
+    input {
+        background-color: $fg0;
+        font-family: 'Roboto';
+        font-weight: 700;
+        font-size: 22px;
+        width: 92%;
+        height: 40px;
+        border: 2px solid $fg3;
+        border-radius: 8px;
+        margin: 0 8px 0 0;
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: $fg4;
+        font-family: 'Roboto';
+        font-weight: 500;
+        opacity: 1; /* Firefox */
+    }
+    
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: $fg4;
+        font-family: 'Roboto';
+        font-weight: 500;
+    }
+    
+    ::-ms-input-placeholder { /* Microsoft Edge */
+        color: $fg4;
+        font-family: 'Roboto';
+        font-weight: 500;
+    }
+
+    div {
+        width: 40px;
+        margin: 0 40px 0 0;
+    }
+
+    button {
+        background-color: rgba(0, 0, 0 ,0);
+        color: $fg3;
+        font-family: 'Open Sans', sans-serif !important;
+        font-size: 30px;
+        border-radius: 8px;
+        border: 0;
+    }
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    background-color: $fg0;
+    height: 370px;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.chat {
+    height:100%;
+    text-align: left;
+    overflow: auto;
+
+    p {
+        color: $text-black;
+        font-size: 20px;
+        border-radius: 8px;
+        margin: 0 0 5px 0;
+    }
+}

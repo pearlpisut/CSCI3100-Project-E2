@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New User Registration</title>
+    <link rel="stylesheet" href="/index.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+</head>
+<body>
+    <h1>BattleGo!</h1>
+    <h2>Register</h2>
+    <form action="/register" method="POST">
+        <div>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <label for="repassword">Confirm password</label>
+            <input type="password" id="repassword" name="repassword" required>
+        </div>
+        <button id="submit-btn" class="btn btn-secondary" type="button" onclick="input_validate()">Register</button>
+        <div style="color: red" id="warning" class="hide">
+            please type the password again.
+        </div>
+    </form>
+    <a href="/login">Log in</a>
+    <script>
+        const password = document.getElementById("password")
+        const repassword = document.getElementById("repassword")
+        const warner = document.getElementById("warning")
+        function input_validate(){
+            console.log(password.value, "  ", repassword.value)
+            if(password.value == repassword.value){
+                document.getElementById("submit-btn").type = "submit"
+            }
+            else{
+                warner.classList.remove("hide")
+                warner.classList.add("show")
+            }
+        }
+    </script>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
+</html>

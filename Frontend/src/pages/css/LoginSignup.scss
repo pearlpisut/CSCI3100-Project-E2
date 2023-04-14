@@ -1,0 +1,76 @@
+@import "./colors.scss";
+
+.logo {
+    color: $fg3;
+    font-weight: 900;
+    font-size: 84px;
+    text-align: center;
+}
+
+.ls-form-container {
+    display: flex;
+    justify-content: center;
+
+    input {
+        background-color: $fg0;
+        font-family: 'Roboto';
+        font-weight: 700;
+        font-size: 22px;
+        width: 230px;
+        height: 40px;
+        border-radius: 8px;
+        display: block;
+        margin: 0 0 8px 0;
+    }
+
+    button {
+        background-color: $blue-d;
+        color: $text-white;
+        font-family: 'Roboto';
+        font-weight: 500;
+        font-size: 18px;
+        height: 40px;
+        border-radius: 8px;
+        margin: 0 0 8px 0;
+        padding: 0 20px 0 20px;
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: $fg4;
+        font-family: 'Roboto';
+        font-weight: 500;
+        opacity: 1; /* Firefox */
+    }
+    
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: $fg4;
+        font-family: 'Roboto';
+        font-weight: 500;
+    }
+    
+    ::-ms-input-placeholder { /* Microsoft Edge */
+        color: $fg4;
+        font-family: 'Roboto';
+        font-weight: 500;
+    }
+}
+
+a.url:link {
+    color: $blue-d;
+    text-decoration: none;
+}
+
+a.url:visited {
+    color: $blue-d;
+    text-decoration: none;
+}
+
+a.url:hover {
+    color: $blue-d;
+    text-decoration: none;
+}
+
+a.url:active {
+    color: $blue-d;
+    text-decoration: none;
+}

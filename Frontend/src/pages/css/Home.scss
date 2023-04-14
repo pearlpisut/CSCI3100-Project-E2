@@ -1,0 +1,70 @@
+@import "./colors.scss";
+
+.home-navbar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+}
+
+/* Right align last child */
+.home-navbar a:last-child {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.homenav-link, .options {
+    background-color: $fg3;
+    color: $text-black;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 45px;
+    height: 45px;
+    width: 110px;
+    margin-right: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.function-container {
+    margin: 120px 0 0 0;
+}
+
+.function-container a {
+    display: block;
+    line-height: 60px;
+    height: 60px;
+    width: 210px;
+    margin: 0 auto 20px auto;
+}
+
+.joingame {
+    background-color: $blue-d;
+    color: $fg0;
+    font-size: 24px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.admin-panel {
+    background-color: $aqua-d;
+    color: $fg0;
+    font-size: 24px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.back-to-login{
+    width: fit-content;
+    background-color: $blue-d;
+    color: $fg0;
+    font-size: 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    padding: 10px;
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
