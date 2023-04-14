@@ -137,9 +137,18 @@ app.delete('/main/admin/delete/:id', verifyToken, (req, res) =>{
     jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {
         if(err) res.sendStatus(403);
         else {
-            // printDeletedUser(req.params.id, res)
+            const deletedUser = req.params.id
             console.log('user deleted')
-            db.collection('users').deleteOne({'_id': new ObjectId(req.params.id)})
+            db.collection('users').deleteOne({'_id': new ObjectId(deletedUser)})
+            db.collection('users').updateMany({friends: {'$all': [deletedUser]}}, {
+                $pull: { friends: deletedUser }
+            })
+            db.collection('users').updateMany({reqinfriends: {'$all': [deletedUser]}}, {
+                $pull: { reqinfriends: deletedUser }
+            })
+            db.collection('users').updateMany({reqoutfriends: {'$all': [deletedUser]}}, {
+                $pull: { reqoutfriends: deletedUser }
+            })
         }
         })
     })
@@ -155,6 +164,8 @@ app.route('/register')
         collection.countDocuments().then((count_doc) => newuser.id = ++count_doc)  //may need to fix this
         newuser.username = req.body.username
         newuser.friends = []
+        newuser.reqinfriends = []
+        newuser.reqoutfriends = []
         newuser.rating = 0
         try{
             const hashedPassword = await bcrypt.hash(req.body.password, 10)
@@ -266,6 +277,112 @@ app.post('/user/friend/add/:id', verifyToken, async (req, res) => {
     });
 });
 
+//accept friend request
+app.post('/user/friend/accept/:accept/:id', verifyToken, async (req, res) => {
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, async (err, authData) => {
+      if (err) res.sendStatus(403)
+      else {
+          const friendId = req.params.id
+          const self = authData._id
+          const agree = req.params.accept
+          if(agree == 'yes'){
+              //add me to friend's friends list
+              db.collection('users').findOne({'_id': new ObjectId(friendId)})
+              .then(friend => {
+                  db.collection('users').updateOne({'_id': new ObjectId(friendId)}, {
+                    $set: {
+                        friends: friend.friends?[self, ...friend.friends]:[self]
+                    }
+                  })
+              })
+              //add friend to my friends list
+              db.collection('users').findOne({'_id': new ObjectId(self)})
+              .then( me => {
+                  let append
+                  if(!me.friends) append = [friendId]
+                  else append = [friendId, ...me.friends]
+                  db.collection('users').updateOne({'_id': new ObjectId(self)}, {
+                      $set: {
+                          friends: append
+                        }
+                    })
+                })
+                res.send("friend request accepted")
+                console.log('friend request accepted')
+            }
+            else{
+                res.send("friend request rejected")
+                console.log('friend request rejected')
+            }
+            //remove friend from my reqin list
+            db.collection('users').updateOne({'_id': new ObjectId(self)}, {
+                $pull: {
+                    reqinfriends: friendId
+                }
+            })
+            //remove me from friend's reqout list
+            db.collection('users').updateOne({'_id': new ObjectId(friendId)}, {
+              $pull: {
+                  reqoutfriends: self
+              }
+            })
+            
+            //remove this solved friend request from my friend request list
+            //   db.collection('friend-request').updateOne({'_id': new ObjectId(self)}, {
+                //     $pull: {
+                    //         friends: friendId   
+                    //     }
+        //   })
+          
+      }
+    });
+});
+
+// send friend request
+app.post('/user/friend/adddd/:id', verifyToken, async (req, res) => {
+    if(req.logout == "true"){
+        res.sendStatus(401)
+        return
+    }
+    jwt.verify(req.token, process.env.SECRET_PLAYER_KEY, async (err, authData) => {
+      if (err) res.sendStatus(403)
+      else {
+          const friendId = req.params.id
+          const self = authData._id
+          //add this new friend request to such friend's reqinfriends
+          db.collection('users').findOne({'_id': new ObjectId(friendId)})
+              .then( friend => {
+                let append
+                if(!friend.reqinfriends) append = [self]
+                else append = [self, ...friend.reqinfriends]
+                db.collection('users').updateOne({'_id': new ObjectId(friendId)}, {
+                    $set: {
+                        reqinfriends: append
+                    }
+                  })
+              })
+              //add this new friend request to my reqoutfriends
+              db.collection('users').findOne({'_id': new ObjectId(self)})
+              .then( me => {
+                let append
+                if(!me.reqoutfriends) append = [friendId]
+                else append = [friendId, ...me.reqoutfriends]
+                db.collection('users').updateOne({'_id': new ObjectId(self)}, {
+                    $set: {
+                        reqoutfriends: append
+                    }
+                  })
+              })
+          res.send("friend request sent")
+          console.log("friend request sent")
+      }
+    });
+});
+
 //view one's own friend
 app.get('/user/friend/view', verifyToken, (req, res) =>{
     if(req.logout == "true"){
@@ -276,14 +393,46 @@ app.get('/user/friend/view', verifyToken, (req, res) =>{
         if(err) res.sendStatus(403);
         else{
             let items = []
-            db.collection('users').find({friends: {$all: [authData._id]}})
+            let reqinR = authData.reqinfriends
+            let reqoutR = authData.reqoutfriends
+            let friendsR = authData.friends
+            
+            let reqin = reqinR.map(e => new ObjectId(e)) //
+            let reqout = reqoutR.map(e => new ObjectId(e)) //
+            let friends = friendsR.map(e => new ObjectId(e)) //
+            db.collection('users').findOne({'_id': new ObjectId(authData._id)})
+                .then(me => {
+                    reqinR = me.reqinfriends
+                    reqin = reqinR.map(e => new ObjectId(e)) //
+                    reqoutR = me.reqoutfriends
+                    reqout = reqoutR.map(e => new ObjectId(e)) //
+                    friendsR = me.friends
+                    friends = friendsR.map(e => new ObjectId(e)) //
+                    console.log('reqin = ', reqinR)
+                    console.log('reqout = ', reqoutR, typeof reqoutR[0])
+                    console.log('reqoutt = ', reqout)
+                    console.log('friends = ', friendsR)
+                    console.log('alll =  ', [...reqin, ...reqout, ...friends])
+                })
+            db.collection('users').find({'_id': {"$in": [...reqin, ...reqout, ...friends]}})
             .forEach(item => {
                 let tmp = {}
+                // console.log(1)
+                // console.log('reqin is ', reqinR[0], typeof reqinR[0])
+                // console.log('item._id is ', item._id.toString(), typeof item._id.toString())
+                // console.log('check equal = ', reqinR[0] == item._id.toString())
                 tmp.username = item.username
-                tmp.status = 'offline'
+                tmp.id = item._id
+                if(reqinR.includes(item._id.toString()))  
+                    tmp.status = 'incoming friend req'
+                else if(reqoutR.includes(item._id.toString()))
+                    tmp.status = 'outgoing friend req'
+                else if(friendsR.includes(item._id.toString()))
+                    tmp.status = 'friend'
                 items.push(tmp)
             })
             .then(()=>{
+                console.log('freinds items ===  ', items)
                 res.status(200).json(items)
             })
         }
