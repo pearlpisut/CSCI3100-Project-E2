@@ -3,6 +3,9 @@ import Square from './Square'
 import {useChannelStateContext, useChatContext} from 'stream-chat-react'
 import {New_Board} from "../board_logic/New_Board"
 
+/* Importing stone drawing */
+import Stone from "./Stone";
+
 var new_board = new New_Board(1)
 new_board.startGame();
 function Board({result, setResult}) {
@@ -43,13 +46,13 @@ function Board({result, setResult}) {
             if (new_board.checkWinner() == 1) {
                 new_board.resetBoard()
                 setResult({
-                    winner: "O",
+                    winner: "White",
                     state: "won"
                 })
             } else if (new_board.checkWinner() == -1) {
                 new_board.resetBoard()
                 setResult({
-                    winner: "X",
+                    winner: "Black",
                     state: "won"
                 })
             }
@@ -88,7 +91,16 @@ function Board({result, setResult}) {
     
                 setBoard(board.map((val, id) => {
                         if (id === square && val === "") {
-                        return player;
+                            if (player === 'X') {
+                                return (
+                                    <Stone stone="black"/>
+                                );
+                            }
+                            else if (player === 'O') {
+                                return (
+                                    <Stone stone="white"/>
+                                );
+                            }
                     }
                     return val;
                 }))
@@ -160,14 +172,24 @@ function Board({result, setResult}) {
     
                 setBoard(board.map((val, id) => {
                     if (id === event.data.square && val === "") {
-                        return event.data.player;
+                        if (event.data.player === 'X') {
+                            return (
+                                <Stone stone="black"/>
+                            );
+                        }
+                        else if (event.data.player === 'O') {
+                            return (
+                                <Stone stone="white"/>
+                            );
+                        }
                     }
                     return val;
                 }))
         }
     })
+
     
-    //Retract_move
+//Retract_move
     const retractMove = async () => {
         console.log("Retracting move --> sender")
         await channel.sendEvent({
@@ -213,16 +235,25 @@ function Board({result, setResult}) {
     //Get local time
     const [startTime] = useState(new Date());
 
+    // Convert turn (X and O) to "Black" and "White"
+    let whoseTurn;
+    if (turn === "O") {
+        whoseTurn = "White";
+    }
+    else if (turn === "X") {
+        whoseTurn = "Black";
+    }
+
     return (
-    <div className = "board">
+    <div className = "board-multiplayer">
         <div className="meta-container">
             <div className="time-container">
                 <div>Start Time: {startTime.toLocaleTimeString('en-GB')}</div>
-                <div>'s Turn</div>
+                <div>{whoseTurn}'s Turn</div>
             </div>
             <div className="game-info-container">
                 <div>Time Elapsed: {formatTime(seconds)}</div>
-                <div>Stone Type: {turn}</div>
+                <div>Stone Type: {whoseTurn}</div>
             </div>
         </div>
         <div className = "row"> 
@@ -624,9 +655,6 @@ function Board({result, setResult}) {
             <Square chooseSquare = {() => {chooseSquare(358);}} val={board[358]} class_name="bot edge"/>
             <Square chooseSquare = {() => {chooseSquare(359);}} val={board[359]} class_name="bot edge"/>
             <Square chooseSquare = {() => {chooseSquare(360);}} val={board[360]} class_name="b-r corner"/>
-        </div>
-        <div>
-            <button onClick = {retractMove}>Request Retraction</button> 
         </div>
     </div>
     )

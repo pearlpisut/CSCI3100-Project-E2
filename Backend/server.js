@@ -10,6 +10,7 @@ require("dotenv").config()
 const StreamChat = require('stream-chat').StreamChat;
 const uuidv4 = require('uuid').v4;
 
+//During the development process, some developers have issues using variables from .env, hence the PORT and SECRET KEYS are hard-coded here.
 const PORT = 2901
 SECRET_PLAYER_KEY = 34234327
 SECRET_ADMIN_KEY =  12345672
@@ -69,7 +70,7 @@ app.route('/login')
                     }
                     // player
                     if(!responsee.admin && responsee.player){
-                        // only grant access to logged-in user to the game
+                        // assigning token to logged-in user to only grant access to the game to them and not user who has not logged-in.
                         jwt.sign(responsee.who, process.env.SECRET_PLAYER_KEY, (err, token) => {
                             if(err) res.sendStatus(403)
                             let returnVal = {
@@ -85,6 +86,7 @@ app.route('/login')
                     }
                     // admin
                     else if(responsee.admin){
+                        // assigning token to logged-in user to only grant access to the game to them and not user who has not logged-in.
                         jwt.sign(responsee.who, process.env.SECRET_ADMIN_KEY, (err, token) =>{
                             if(err) res.sendStatus(403)
                             let returnVal = {
@@ -104,16 +106,18 @@ app.route('/login')
 
 // logout
 app.post('/logout', [verifyToken, logout], (req, res) => {
-    // add token to be logged out to blacklist.
+    // add token to be logged out to blacklist (Done via 'logout' in auth.js).
 })
         
 //admin menu
 app.get('/main/admin', verifyToken, (req, res) => {
+    // each API below will also contain this if clause to ensure logged-out user need to log-in again before accessing the game.
     if(req.logout == "true"){
         res.sendStatus(401)
         return
     }
-    jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {
+    jwt.verify(req.token, process.env.SECRET_ADMIN_KEY, (err, authData) => {  /*each API below will also contain this line of code. 
+        It is meant for ensuring the game is not accessible to users who have not logged-in.*/
         if(err) res.sendStatus(403)
         else {
             let items = []
@@ -123,12 +127,13 @@ app.get('/main/admin', verifyToken, (req, res) => {
                 if(item.role != "admin")
                     items.push(item)
             })
+            //displaying all users and their info
             .then(()=> res.json(items) )
         }
         })
-    // console.log("this is the admin, username: ", req.user.username)
 })
-    
+
+//removing user (by admin)
 app.delete('/main/admin/delete/:id', verifyToken, (req, res) =>{
     if(req.logout == "true"){
         res.sendStatus(401)
@@ -140,12 +145,15 @@ app.delete('/main/admin/delete/:id', verifyToken, (req, res) =>{
             const deletedUser = req.params.id
             console.log('user deleted')
             db.collection('users').deleteOne({'_id': new ObjectId(deletedUser)})
+            //remove this deleted user from all friend list of all users
             db.collection('users').updateMany({friends: {'$all': [deletedUser]}}, {
                 $pull: { friends: deletedUser }
             })
+            //remove this deleted user from all incoming freind request list of all users
             db.collection('users').updateMany({reqinfriends: {'$all': [deletedUser]}}, {
                 $pull: { reqinfriends: deletedUser }
             })
+            //remove this deleted user from all outgoing friend request list of all users
             db.collection('users').updateMany({reqoutfriends: {'$all': [deletedUser]}}, {
                 $pull: { reqoutfriends: deletedUser }
             })
@@ -153,7 +161,7 @@ app.delete('/main/admin/delete/:id', verifyToken, (req, res) =>{
         })
     })
 
-// Registration
+// Register new users
 app.route('/register')
     .get((req, res) => {
         res.render("regis.ejs")
@@ -161,13 +169,15 @@ app.route('/register')
     .post(async (req, res) => {
         let newuser = {}
         const collection = db.collection('users')
-        collection.countDocuments().then((count_doc) => newuser.id = ++count_doc)  //may need to fix this
+        collection.countDocuments().then((count_doc) => newuser.id = ++count_doc)
+        // initializing new user
         newuser.username = req.body.username
         newuser.friends = []
         newuser.reqinfriends = []
         newuser.reqoutfriends = []
         newuser.rating = 0
         try{
+            //hashing the password inputted for security
             const hashedPassword = await bcrypt.hash(req.body.password, 10)
             newuser.password = hashedPassword
             db.collection("users").insertOne(newuser)
@@ -181,7 +191,7 @@ app.route('/register')
         console.log(newuser)
     })
 
-//game history
+// getting all game histories in the system
 app.get('/view/gamehist', verifyToken, (req, res) =>{
     if(req.logout == "true"){
         res.sendStatus(401)
@@ -203,6 +213,7 @@ app.get('/view/gamehist', verifyToken, (req, res) =>{
       })
 })
 
+// getting game history of a specific id
 app.get('/view/gamehist/:id', verifyToken, (req, res) =>{
     if(req.logout == "true"){
         res.sendStatus(401)
@@ -216,11 +227,6 @@ app.get('/view/gamehist/:id', verifyToken, (req, res) =>{
         }
       })
 })
-
-function printDeletedUser(id, res){
-    db.collection('users').findOne({'_id': new ObjectId(id)})
-        .then(user => res.send(`deleted ${user.username}`))
-}
 
 //showing all user
 app.get('/view/allusers', verifyToken, (req, res) =>{
@@ -240,7 +246,9 @@ app.get('/view/allusers', verifyToken, (req, res) =>{
       })
 })
 
-//adding new friend
+// adding new friend
+/* note that this API is no longer used as we further learned we have to develop not just add-friend API
+but also send freind request and accept friend request APIs. Please skip this API.*/
 app.post('/user/friend/add/:id', verifyToken, async (req, res) => {
     if(req.logout == "true"){
         res.sendStatus(401)
@@ -318,26 +326,18 @@ app.post('/user/friend/accept/:accept/:id', verifyToken, async (req, res) => {
                 res.send("friend request rejected")
                 console.log('friend request rejected')
             }
-            //remove friend from my reqin list
+            //remove friend from my reqin list (incoming friend request list) as the request is now solved.
             db.collection('users').updateOne({'_id': new ObjectId(self)}, {
                 $pull: {
                     reqinfriends: friendId
                 }
             })
-            //remove me from friend's reqout list
+            //remove me from friend's reqout list (outgoing friend request list) as the request is not solved.
             db.collection('users').updateOne({'_id': new ObjectId(friendId)}, {
               $pull: {
                   reqoutfriends: self
               }
-            })
-            
-            //remove this solved friend request from my friend request list
-            //   db.collection('friend-request').updateOne({'_id': new ObjectId(self)}, {
-                //     $pull: {
-                    //         friends: friendId   
-                    //     }
-        //   })
-          
+            })          
       }
     });
 });
@@ -353,7 +353,7 @@ app.post('/user/friend/adddd/:id', verifyToken, async (req, res) => {
       else {
           const friendId = req.params.id
           const self = authData._id
-          //add this new friend request to such friend's reqinfriends
+          //add this new friend request to such friend's reqinfriends (incoming friend request)
           db.collection('users').findOne({'_id': new ObjectId(friendId)})
               .then( friend => {
                 let append
@@ -365,7 +365,7 @@ app.post('/user/friend/adddd/:id', verifyToken, async (req, res) => {
                     }
                   })
               })
-              //add this new friend request to my reqoutfriends
+              //add this new friend request to my reqoutfriends (outgoing friend request)
               db.collection('users').findOne({'_id': new ObjectId(self)})
               .then( me => {
                 let append
@@ -384,6 +384,7 @@ app.post('/user/friend/adddd/:id', verifyToken, async (req, res) => {
 });
 
 //view one's own friend
+// this API serves information to show in each user's friend page. It shows friends, outgoing friend request, and incoming friend request.
 app.get('/user/friend/view', verifyToken, (req, res) =>{
     if(req.logout == "true"){
         res.sendStatus(401)
@@ -393,6 +394,7 @@ app.get('/user/friend/view', verifyToken, (req, res) =>{
         if(err) res.sendStatus(403);
         else{
             let items = []
+            //authData contains credentials of the current user. Hence, we can access friends and request lists from it.
             let reqinR = authData.reqinfriends
             let reqoutR = authData.reqoutfriends
             let friendsR = authData.friends
@@ -408,12 +410,13 @@ app.get('/user/friend/view', verifyToken, (req, res) =>{
                     reqout = reqoutR.map(e => new ObjectId(e)) //
                     friendsR = me.friends
                     friends = friendsR.map(e => new ObjectId(e)) //
-                    console.log('reqin = ', reqinR)
-                    console.log('reqout = ', reqoutR, typeof reqoutR[0])
-                    console.log('reqoutt = ', reqout)
-                    console.log('friends = ', friendsR)
-                    console.log('alll =  ', [...reqin, ...reqout, ...friends])
+                    //console.log('reqin = ', reqinR)
+                    //console.log('reqout = ', reqoutR, typeof reqoutR[0])
+                    //console.log('reqoutt = ', reqout)
+                    //console.log('friends = ', friendsR)
+                    //console.log('alll =  ', [...reqin, ...reqout, ...friends])
                 })
+            //getting each user from all the three lists from the db.
             db.collection('users').find({'_id': {"$in": [...reqin, ...reqout, ...friends]}})
             .forEach(item => {
                 let tmp = {}
@@ -423,6 +426,7 @@ app.get('/user/friend/view', verifyToken, (req, res) =>{
                 // console.log('check equal = ', reqinR[0] == item._id.toString())
                 tmp.username = item.username
                 tmp.id = item._id
+                //classifying the friend status
                 if(reqinR.includes(item._id.toString()))  
                     tmp.status = 'incoming friend req'
                 else if(reqoutR.includes(item._id.toString()))
@@ -432,7 +436,9 @@ app.get('/user/friend/view', verifyToken, (req, res) =>{
                 items.push(tmp)
             })
             .then(()=>{
-                console.log('freinds items ===  ', items)
+                //console.log('freinds items ===  ', items)
+
+                //return the complete lists
                 res.status(200).json(items)
             })
         }
@@ -462,6 +468,7 @@ app.post('/user/friend/remove/:id', verifyToken, async (req, res) => {
                     friends: friendId   
                 }
               })
+            //showing response (for referrence during development and testing)
             db.collection('users').findOne({'_id': new ObjectId(friendId)})
                 .then(friend => {
                     res.send(`(${authData.username}) and (${friend.username}) are no longer friends`)
@@ -470,7 +477,8 @@ app.post('/user/friend/remove/:id', verifyToken, async (req, res) => {
     });
 });
 
-//show specific user (for showing opponent's info/a specific friend)
+//show specific user 
+// this API will be utilized in showing opponent's info/a specific friend
 app.get('/view/:id', verifyToken, (req, res) =>{
     if(req.logout == "true"){
         res.sendStatus(401)
@@ -536,6 +544,9 @@ app.post('/update/rating', verifyToken, async (req, res) => {
       }
     });
 });
+
+
+// below are the codes relating to server connections to match two players in a game.
 
 
 const api_key = "2pgm4vaqzc3k"

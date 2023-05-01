@@ -26,7 +26,7 @@ function SignUp({setIsAuth}){
     return(
         <div className = "Signup">
             
-            <label>Create a game room</label>
+            <h1>Create a game room</h1>
             {/*
             <input
                 placeholder='First Name'
@@ -49,8 +49,10 @@ function SignUp({setIsAuth}){
                 onChange = {(event) => 
                     setUser({...user, password: event.target.value})}
             />
-            <button onClick={signUp}>Start a game room </button>
-            <NavLink className = "choose_game" url="/choose_game" text="Back to Chose Game" />
+            <br></br>
+            <br></br>
+            <button className="nav-link" onClick={signUp}>Start a game room </button>
+            <NavLink className = "choose_game homenav-link" style={{'width': '100px'}} url="/choose_game" text="Back" />
         </div>
     )
 }

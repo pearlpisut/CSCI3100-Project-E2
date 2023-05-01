@@ -25,12 +25,12 @@ export default function Home() {
             <div>
                 <div class="home-navbar">
                     <NavLink className="homenav-link" url="/friend" text="Friends" />
-                    <NavLink className="homenav-link" url="/chat" text="Chat" />
+                    {/* <NavLink className="homenav-link" url="/chat" text="Chat" /> */}
                     <NavLink className="homenav-link" url="/history" text="History" />
-                    <NavLink className="homenav-link" url="/logout" text="Log out" />
+                    <NavLink className="homenav-logout" url="/logout" text="Log out" />
                 </div>
                 <br />
-                <h1>Welcome [ {user.user.username} ]</h1>
+                <h1>Welcome [ <span style={{color: "#4c9900"}}>{user.user.username}</span> ]</h1>
                 <Logo />
                 <MainMenu userRole={user.type} />
             </div>

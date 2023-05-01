@@ -1,12 +1,11 @@
 const express = require('express')
 require('dotenv').config()
-// const router = express.Router()
 const bcrypt = require('bcrypt')
 const {connectToDb, getDb}  = require('../db')
 const jwt = require('jsonwebtoken')
 
 let db = getDb()
-
+// acquire mongoDB database
 connectToDb((err)=>{
     if(!err){
         db = getDb()
@@ -14,6 +13,7 @@ connectToDb((err)=>{
     }
 })
 
+//Verify log-in credentials and indicate the log-in status, e.g., if it's error, if it's admin or user.
 async function loginAuth(res, req, visitor){
     if(!visitor){
         console.log("invalid username")
@@ -35,6 +35,7 @@ async function loginAuth(res, req, visitor){
     }
 }
 
+//verifying user's token to only allow logged-in user to access the game
 function verifyToken(req, res, next) {
     // Get auth header value
     const bearerHeader = req.headers['authorization']
@@ -44,7 +45,7 @@ function verifyToken(req, res, next) {
         const bearerToken = bearer[1]
         req.token = bearerToken
 
-        // giving status of logged out or not
+        // giving status of logged out or not by checking if the user's token is in blacklist in the db.
         db.collection('blacklist').countDocuments({token: req.token})
             .then(count => {
                 if(count > 0){
@@ -57,12 +58,12 @@ function verifyToken(req, res, next) {
                 next()
             })
     } 
-    else  res.sendStatus(403) // Forbidden    
+    else  res.sendStatus(403)    
 }
 
 function logout(req, res, next){
     console.log("Logged out: ", req.logout)
-    //if logged out then return unauthorized
+    //if user has already logged out, return unauthorized
     if(req.logout == "true"){
         // res.sendStatus(401)
         res.json({status: 'logged-out-already'})

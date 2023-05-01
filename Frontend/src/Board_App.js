@@ -1,4 +1,4 @@
-import "./App.css";
+import "./App.scss";
 import { StreamChat } from "stream-chat";
 import { Chat } from "stream-chat-react";
 import Cookies from "universal-cookie";
@@ -73,7 +73,7 @@ return (
       {isAuth ? (
         <Chat client={client}>
           <JoinGame />
-          <button onClick={logOut}> Back to Create game room</button>
+          <button class="homenav-link" style={{width: 'fit-content', 'font-family': 'Roboto', 'margin-top': '50px', 'background-color': '#f9f5d7'}} onClick={logOut}> Back to Create game room</button>
         </Chat>
       ) : (
         <>

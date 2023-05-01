@@ -1,0 +1,44 @@
+@import "../pages/css/colors.scss";
+
+.gamemode{
+    width: fit-content;
+
+    color: $text-black;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 45px;
+    height: 45px;
+    padding: 0 14px;
+    margin-right: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+
+    margin: 10px 0;
+}
+
+.one{
+    background-color: $blue-d;
+}
+
+.two{
+    background-color: $aqua-d;
+}
+
+.difflevel{
+    margin: 10px 0;
+    width: 150px;
+}
+
+.alldifflevel{
+    margin-top: 60px;
+}
+
+.easy{
+    background-color: $blue-d;
+}
+.medium{
+    background-color: $aqua-d;
+}
+.hard{
+    background-color: $red-l;
+}

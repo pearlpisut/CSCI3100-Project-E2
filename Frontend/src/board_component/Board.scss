@@ -17,12 +17,11 @@
     /* border: 1px solid black; */
     display: flex;
     flex-direction: column;
-}
-  
-.row {
-    /*flex: 5.26%;*/
-    display: flex;
-    flex-direction: row;
+    .row {
+        /*flex: 5.26%;*/
+        display: flex;
+        flex-direction: row;
+    }
 }
   
 .square {
@@ -89,8 +88,8 @@
     rotate: 270deg;
 }
 
-.leave-game {
-    background-color: $red-l;
+.return-to-room {
+    background-color: $fg3;
     color: $bg0_h;
     font-family: 'Roboto';
     font-size: 18px;

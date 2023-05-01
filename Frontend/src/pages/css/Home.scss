@@ -25,6 +25,19 @@
     text-decoration: none;
 }
 
+.homenav-logout{
+    background-color: #fb4934;
+    color: $text-black;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 45px;
+    height: 45px;
+    width: 110px;
+    margin-right: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
 .function-container {
     margin: 120px 0 0 0;
 }

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import {useChatContext, Channel} from 'stream-chat-react'
 import Game from './Game'
 import CustomInput from './CustomInput'
+import './joingame.scss'
 
 // Create game and wait the opponent to join
 function JoinGame() {
@@ -40,14 +41,14 @@ function JoinGame() {
             </Channel>  
         ) : (
             <div className='joinGame'>
-                <h4>Create Game</h4>
+                <h2 style={{'font-size': '50px'}}>Create Game</h2>
                 <input 
                 placeholder="Username of the rival..."
                 onChange = {(event) => {
                     setRivalUsername(event.target.value)
                 }}
             />
-            <button onClick={createChannel}>Join/ Start Game</button>
+            <button className="joingame-btn homenav-link" style={{'margin-top': '20px'}} onClick={createChannel}>Join/ Start Game</button>
             </div>
         )}
         </>

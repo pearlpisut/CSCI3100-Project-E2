@@ -11,7 +11,7 @@ function Buttons(props) {
     );
 }
 
-export default function UserContainer(props) {
+export default function UserContainer(props, username) {
 
     const class_name = props.class;
     // const user = props.user
@@ -33,6 +33,7 @@ export default function UserContainer(props) {
         console.log('delete btn clicked')
         // console.log('admin token: ', admin.us)
         let setHavechange = props.setHavechange
+        alert(`user '${username}' has been deleted`)
         setHavechange(new Date())
     }
 
@@ -48,14 +49,14 @@ export default function UserContainer(props) {
                 </div>
                 <div class="btn-functions">
                     {/* {props.buttons.map(e => <Buttons {...e}/>)} */}
-                    <button className="delete" onClick={() => deleteUser(user._id)}>Delete</button>
+                    <button className="delete" onClick={() => deleteUser(user._id, user.username)}>Delete</button>
                     {/* <button className="view-info">View info</button> */}
                 </div>
             </div>
             <div className="all-info">
                 <div>id: {user._id}</div>
                 <div>rating: {user.rating}</div>
-                <div>friends: {user.friends}</div>                
+                <div>friends: {user.friends.length}</div>                
             </div>
         </div>
     );

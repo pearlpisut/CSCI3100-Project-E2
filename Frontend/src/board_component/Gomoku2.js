@@ -45,7 +45,7 @@ function Gomoku2(){
     else if (player === "O") {
       setTimeout(() => {
         makeAiMove();
-      }, 0.4); // Wait for 0.5 seconds making AI move
+      }, 400); // Wait for 0.5 seconds making AI move
     }
   }, [board, player]);
 

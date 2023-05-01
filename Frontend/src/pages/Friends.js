@@ -8,7 +8,9 @@ import { useNavigate } from "react-router-dom"
 export default function Friends() {
     const cookies = new Cookies()
     const user = cookies.get('user')
+    // console.log('see user  :  ', user)
     const [friendlist, setFriendlist] = useState([])
+    const [friendchange, setFriendchange] = useState(true)
 
     const navigate = useNavigate()
     useEffect(()=>{
@@ -16,7 +18,7 @@ export default function Friends() {
             navigate("/login", { replace: true })
             alert('You have already logged-out. Please log-in again.')
         }
-    }, [])
+    }, [friendchange])
 
     const links = [
         {class: "nav-link", url: "/friendsearch", text: "Search"},
@@ -29,26 +31,22 @@ export default function Friends() {
             headers: {
                 'Authorization': `Bearer ${user.token}`
             }
-    })
-    .then(res => res.json())
-    .then(res => setFriendlist(res))
-    }, [])
-    console.log(friendlist)
-    const friends = [
-        {username: "Thant", status: "Offline", userid: "1" },
-        {username: "Max", status: "Online", userid: "2"},
-        {username: "Jeff", status: "Offline", userid: "3"},
-        {username: "Pearl", status: "Online", userid: "4"},
-        {username: "Oranuch", status: "Offline", userid: "5"},
-        {username: "csci3100", status: "Online", userid: "6"},
-        {username: "csci2100", status: "Online", userid: "7"},
-        {username: "ceng3420", status: "Online", userid: "8"},
-        {username: "csci1130", status: "Offline", userid: "9"},
-    ];
+        })
+        .then(res => res.json())
+        .then(res => setFriendlist(res))
+    }, [friendchange])
+    console.log('friendlist = ', friendlist)
+    friendlist.forEach(e => console.log('ee - ', e))
     return (
         <>
             <NavbarBuilder header="Friends" links={links} />
-            {friendlist.map(e => <FriendContainer {...e}/>)} 
+            {friendlist.map(e => <FriendContainer 
+                username = {e.username}
+                status = {e.status}
+                id = {e.id}
+                setFriendchange = {setFriendchange}
+                friendchange = {friendchange}
+            />)}             
         </>
     );
 }

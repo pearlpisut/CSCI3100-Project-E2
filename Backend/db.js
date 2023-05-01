@@ -1,3 +1,4 @@
+//This file provides functions to connect the program with MongoDB
 const {MongoClient} = require('mongodb')
 const uri = "mongodb+srv://pearl:pearl_e2_3100@battlego.wywajfd.mongodb.net/?retryWrites=true&w=majority";
 let collection

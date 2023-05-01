@@ -16,7 +16,7 @@ export default function MainMenu(props) {
         return (
             <div class="function-container">
                 <NavLink className="joingame" url="/choose_game" text="JOIN A GAME"/>
-                <NavLink className="options" url="/options" text="OPTIONS"/>
+                {/* <NavLink className="options" url="/options" text="OPTIONS"/> */}
             </div>
         );
     }

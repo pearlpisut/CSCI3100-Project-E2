@@ -11,10 +11,10 @@ export default function Login({setIsAuth}) {
                 <span>Don't have an account? </span>
                 <a class="url" href = "/signup">Sign Up</a>
             </div>
-            <div>
+            {/* <div>
                 <span>Temporary link: </span>
                 <a class="url" href = "/home">Home</a>
-            </div>
+            </div> */}
         </>
     );
 }

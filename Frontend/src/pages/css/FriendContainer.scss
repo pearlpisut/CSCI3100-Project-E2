@@ -40,14 +40,19 @@
 
     .avatar {
         /* Default placeholder color */
-        background-color: $red-l;
+        background-color: $aqua-d;
         /* TODO: Insert user profile image */
-        display: inline-block;
+        display: flex;
+        align-items: center;
+        justify-content: middle;
+        font-size: 48px;
+        overflow: hidden;
         height: 60px;
         width: 60px;
         border-radius: 50%;
     }
 
+    /*
     .online {
         background-color: $aqua-d;
     }
@@ -55,6 +60,7 @@
     .offline {
         background-color: $red-l;
     }
+    */
     
     .btn-functions {
         justify-content: right;

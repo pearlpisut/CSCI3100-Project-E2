@@ -1,0 +1,22 @@
+@import '../pages/css/colors.scss';
+@import "https://fonts.googleapis.com/css2?family=Roboto:wght@500;700;900&display=swap";
+
+input{
+    background-color: $fg0;
+    font-family: 'Roboto';
+    font-weight: 700;
+    font-size: 22px;
+    width: 230px;
+    height: 40px;
+    border-radius: 8px;
+    display: block;
+    // margin: 0 0 8px 0;
+    margin: 0 auto;
+}
+
+.joingame-btn{
+    font-family: 'Roboto' !important;
+    width: fit-content !important;
+    display: inline-block !important;
+    text-align: center !important;
+}
