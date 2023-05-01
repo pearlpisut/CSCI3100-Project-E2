@@ -43,8 +43,9 @@ nodemon server.js
 Then, add a `.env` file to the repository and add the following into the file
 ```bash
 PORT = 2901
-SECRET_PLAYER_KEY = <literally, anything. Perhaps number, e.g., 34234327>  # do not type the bracket '<', '>'
+SECRET_PLAYER_KEY = <literally, anything. Perhaps number, e.g., 34234327>
 SECRET_ADMIN_KEY = <literally, anything. Perhaps number, e.g., 1823423>
+# do not type the bracket '<', '>'
 ```
 Afterwards, the program will be running at `localhost:2901`, where the frontend React app will fetch data from. Note that if issues occur when using `.env` files, feel free to remove them as keys such as `PORT` and others have also been hard-coded to accommmodate this.
 
