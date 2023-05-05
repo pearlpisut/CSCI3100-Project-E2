@@ -33,7 +33,7 @@ export default function UserContainer(props, username) {
         console.log('delete btn clicked')
         // console.log('admin token: ', admin.us)
         let setHavechange = props.setHavechange
-        alert(`user '${username}' has been deleted`)
+        alert(`a user has been deleted`)
         setHavechange(new Date())
     }
 
