@@ -65,3 +65,6 @@ Afterwards, the program will be running at `localhost:2901`, where the frontend 
 - Phutanate Pisutsin - 1155163440 (Backend)
 - Oranuch Ekkowit - 1155168715 (Backend)
 - Ho Chun Tou - 1155163338 (Frontend)
+
+## Footnote
+The UI has not been implemented to accommodate *Friend* feature. However, users may refer to API routing in `server.js` and test the API to send friend request in platform such as Postman or via `request.rest`. Friend request and friend list still can be viewed in the application.
