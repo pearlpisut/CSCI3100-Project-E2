@@ -1,5 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 
+/*
+    Drawing Gobang game board using HTML canvas
+*/
 const BOARD_SIZE = 19;
 const CELL_SIZE = 20;
 const BOARD_MARGIN = 20;
