@@ -1,6 +1,8 @@
 import NavLink from "../components/NavLink";
 import "../pages/css/NavbarHeader.scss";
 
+// Creates custom Navbar component taking a "header", and a list of "button"s as an argument
+
 export default function NavbarBuilder(props) {
     const header = props.header;
     const links = props.links
