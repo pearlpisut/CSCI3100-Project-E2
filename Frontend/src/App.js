@@ -21,7 +21,7 @@ import Gomoku3 from "./board_component/Gomoku3";
 import Board_Game_App from "./Board_App"
 import React, {useState} from "react"
 
-
+// Routing for all the different pages on the web app, e.g. "/home" should direct users to the homepage etc.
 export default function App() {
   const [cookie, setCookie] = useState({})
   return (
