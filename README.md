@@ -7,7 +7,7 @@ This project is a part of CSCI3100 Software Engineering.
 `BattleGo!` is inspired by the classic game of Gomoku or Gobang - so you already know the game rules. It supports both Multiplayer, where you can compete against your friend, and Machine-player mode, where you can try to challenge our AI player programmed to beat you! at different difficulty level you can choose. There are more features and details to discover in the game. Please find the details below for the information about the developments of the program and how to run it.
 
 <p align="center">
-<img src = "https://imgtr.ee/images/2023/05/06/aWHiD.png" width="650">
+<img src = "https://i.imgur.com/Ro6YHMY.png" width="650">
 </p>
 
 ## Tech Stack
