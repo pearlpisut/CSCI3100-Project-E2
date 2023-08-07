@@ -11,7 +11,7 @@ This project is a part of CSCI3100 Software Engineering.
 </p>
 
 ## Tech Stack
-
+(MERN Application)
 ### Frontend: 
 React, HTML, Javascript, SCSS
 ### Backend: 
